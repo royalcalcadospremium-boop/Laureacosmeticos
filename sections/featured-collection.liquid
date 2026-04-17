@@ -1,0 +1,387 @@
+{%- capture section_settings -%}
+{
+  "stackable": {% if section.settings.layout == 'vertical' and section.settings.stack_desktop == false %}false{% else %}true{% endif %},
+  "layout": {{ section.settings.layout | json }}
+}
+{%- endcapture -%}
+
+<section class="section" data-section-id="{{ section.id }}" data-section-type="featured-collection" data-section-settings='{{ section_settings }}'>
+  {% render 'royal-overlap', id: section.id %}
+
+  {%- assign collection = collections[section.settings.collection] -%}
+
+  <div class="container">
+    <header class="section__header">
+      <div class="section__header-stack">
+        <h2 class="section__title heading h3">{{ section.settings.title | default: collection.title | escape }}</h2>
+      </div>
+
+      {%- if section.settings.link_title != blank -%}
+        <a href="{{ section.settings.link_url | default: collection.url | default: '#' }}" class="section__action-link link">{{ section.settings.link_title | escape }} {% render 'icon', icon: 'tail-right' %}</a>
+      {%- endif -%}
+    </header>
+  </div>
+
+  <div class="container {% if section.settings.layout != 'vertical' %}container--flush{% endif %}">
+    {%- capture product_list -%}
+      <div class="product-list product-list--{{ section.settings.layout }} {% if section.settings.layout == 'vertical' %}product-list--scrollable{% endif %} {% if section.settings.stack_desktop %}product-list--stackable{% endif %}">
+        {%- assign use_placeholder = true -%}
+
+        {%- if collection.empty? -%}
+          {%- assign products = (1..section.settings.products_count) -%}
+        {%- else -%}
+          {%- assign products = collection.products -%}
+          {%- assign use_placeholder = false -%}
+        {%- endif -%}
+
+        {%- for product in products limit: section.settings.products_count -%}
+          {%- if section.settings.layout == 'vertical' -%}
+            {%- if use_placeholder -%}
+              {%- include 'product-item-placeholder', product: product, grid_classes: '1/4--lap 1/5--desk 1/6--wide', show_add_to_cart: section.settings.show_quick_buy -%}
+            {%- else -%}
+              {%- include 'product-item', product: product, grid_classes: '1/4--lap 1/5--desk 1/6--wide', show_add_to_cart: section.settings.show_quick_buy -%}
+            {%- endif -%}
+          {%- elsif section.settings.layout == 'horizontal' -%}
+            {%- if use_placeholder -%}
+              {%- include 'product-item-placeholder', product: product, horizontal: true, grid_classes: '1/2--tablet 1/3--lap-and-up', show_add_to_cart: false -%}
+            {%- else -%}
+              {%- include 'product-item', product: product, horizontal: true, grid_classes: '1/2--tablet 1/3--lap-and-up', show_add_to_cart: false -%}
+            {%- endif -%}
+          {%- else -%}
+            {%- assign mod = forloop.index0 | modulo: 3 -%}
+
+            {%- if mod == 0 -%}
+              <div class="product-list__column product-list__column--highlight">
+            {%- elsif mod == 1 -%}
+              <div class="product-list__column {% if forloop.last %}product-list__column--shrink{% endif %}">
+            {%- endif -%}
+
+            {%- if mod == 0 -%}
+              {%- if use_placeholder -%}
+                {%- include 'product-item-placeholder', product: product, show_add_to_cart: false -%}
+              {%- else -%}
+                {%- include 'product-item', product: product, show_add_to_cart: false -%}
+              {%- endif -%}
+            {%- else -%}
+              {%- if use_placeholder -%}
+                {%- include 'product-item-placeholder', product: product, horizontal: true, show_add_to_cart: false -%}
+              {%- else -%}
+                {%- include 'product-item', product: product, horizontal: true, show_add_to_cart: false -%}
+              {%- endif -%}
+            {%- endif -%}
+
+            {%- if mod == 0 or mod == 2 or forloop.last -%}
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endcapture -%}
+
+    {%- if section.settings.layout == 'vertical' -%}
+      <div class="scroller">
+        <div class="scroller__inner">
+          {{ product_list }}
+        </div>
+      </div>
+    {%- else -%}
+      {{ product_list }}
+    {%- endif -%}
+  </div>
+
+  {%- comment -%}
+  --------------------------------------------------------------------------------------
+  DUAL CTA (somente estilo/script; markup original dos cards intacto)
+  --------------------------------------------------------------------------------------
+  {%- endcomment -%}
+
+  <style>
+    /* Variáveis configuráveis */
+    [data-section-id="{{ section.id }}"]{
+      --gx-mini-bg: {{ section.settings.mini_btn_bg | default: '#ffffff' }};
+      --gx-mini-text: {{ section.settings.mini_btn_text | default: '#1f2937' }};
+      --gx-mini-border: {{ section.settings.mini_btn_border | default: '#e5e7eb' }};
+      --gx-mini-bg-hover: {{ section.settings.mini_btn_bg_hover | default: '#f3f4f6' }};
+      --gx-mini-text-hover: {{ section.settings.mini_btn_text_hover | default: '#111827' }};
+      --gx-gap: 8px;
+      --gx-buy-basis-d: {{ section.settings.buy_basis_desktop | default: 78 }}%;
+      --gx-buy-basis-m: {{ section.settings.buy_basis_mobile  | default: 74 }}%;
+    }
+
+    /* Container flex p/ dois botões */
+    [data-section-id="{{ section.id }}"] .gx-dual-cta{
+      display: flex; align-items: stretch; gap: var(--gx-gap); width: 100%;
+    }
+
+    /* Botão Comprar existente: apenas base de largura */
+    [data-section-id="{{ section.id }}"] .gx-dual-cta .gx-buy{
+      flex: 1 1 var(--gx-buy-basis-d);
+      background: {{ section.settings.buy_now_bg }} !important;
+      color: {{ section.settings.buy_now_text_color }} !important;
+      border-color: transparent !important;
+    }
+    [data-section-id="{{ section.id }}"] .gx-dual-cta .gx-buy:hover{
+      background: {{ section.settings.buy_now_bg_hover }} !important;
+      color: {{ section.settings.buy_now_text_color }} !important;
+    }
+
+    /* Botão mini de carrinho */
+    [data-section-id="{{ section.id }}"] .gx-addtocart-mini{
+      flex: 0 0 calc(100% - var(--gx-buy-basis-d));
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 0 10px; border-radius: 9999px;
+      border: 1px solid var(--gx-mini-border);
+      background: var(--gx-mini-bg); color: var(--gx-mini-text);
+      font-weight: 600; cursor: pointer;
+      transition: transform .06s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+      min-height: 44px; line-height: 1;
+    }
+    [data-section-id="{{ section.id }}"] .gx-addtocart-mini:hover{
+      background: var(--gx-mini-bg-hover); color: var(--gx-mini-text-hover);
+    }
+    [data-section-id="{{ section.id }}"] .gx-addtocart-mini:active{ transform: translateY(1px); }
+    [data-section-id="{{ section.id }}"] .gx-addtocart-mini svg{ width: 22px; height: 22px; display:block; }
+    [data-section-id="{{ section.id }}"] .gx-addtocart-mini.gx-added{ box-shadow: 0 0 0 2px rgba(16,185,129,.25) inset; }
+    [data-section-id="{{ section.id }}"] .gx-addtocart-mini.gx-error{ box-shadow: 0 0 0 2px rgba(239,68,68,.25) inset; }
+
+    /* Mobile: proporção */
+    @media (max-width: 749px){
+      [data-section-id="{{ section.id }}"] .gx-dual-cta .gx-buy{ flex-basis: var(--gx-buy-basis-m); }
+      [data-section-id="{{ section.id }}"] .gx-addtocart-mini{ flex-basis: calc(100% - var(--gx-buy-basis-m)); min-height: 42px; }
+    }
+    /* Limita o título do produto a 2 linhas com "..." */
+[data-section-id="{{ section.id }}"] .product-item__title,
+[data-section-id="{{ section.id }}"] .product-card__title,
+[data-section-id="{{ section.id }}"] .card__heading,
+[data-section-id="{{ section.id }}"] .product__title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;   /* número de linhas */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 3.0em;       /* mantém altura uniforme */
+}
+
+  </style>
+
+  <script>
+    (function(){
+      var root = document.querySelector('[data-section-id="{{ section.id }}"]');
+      if(!root) return;
+
+      /* ===== Utils ===== */
+      function cartIcon(){
+        var ns = 'http://www.w3.org/2000/svg';
+        var svg = document.createElementNS(ns,'svg');
+        svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('aria-hidden','true');
+        var p = document.createElementNS(ns,'path');
+        p.setAttribute('d','M7 4h-2l-1 2v2h2l3.6 7.59c.17.33.51.41.74.41h7.66a1 1 0 0 0 .95-.68l2-6A1 1 0 0 0 20 8H8.31l-.95-2H21V4H7zm3 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm8 0a2 2 0 1 0 .001 4.001A2 2 0 0 0 18 19z');
+        svg.appendChild(p); return svg;
+      }
+      function getCard(el){
+        return el.closest('.product-item, .product-card, .product, .grid__item, li, article') || root;
+      }
+      function getProductLink(scope){
+        return (scope || root).querySelector('a[href*="/products/"]:not([href*="#"])');
+      }
+      function openCartDrawerCore(){
+        try {
+          if (window.CartDrawer && typeof window.CartDrawer.open === 'function') {
+            try { if (typeof window.CartDrawer.refresh === 'function') window.CartDrawer.refresh(); } catch(e){}
+            window.CartDrawer.open();
+            return true;
+          }
+        } catch(e){}
+        try { document.dispatchEvent(new CustomEvent('cart:refresh')); } catch(e){}
+        try { document.dispatchEvent(new CustomEvent('cart:open')); } catch(e){}
+        try { window.dispatchEvent(new CustomEvent('cart:open')); } catch(e){}
+        try { document.dispatchEvent(new CustomEvent('theme:cart:open')); } catch(e){}
+        try { if (window.cartDrawer && typeof window.cartDrawer.open === 'function') { window.cartDrawer.open(); return true; } } catch(e){}
+        try { if (window.theme && window.theme.Cart && typeof window.theme.Cart.open === 'function') { window.theme.Cart.open(); return true; } } catch(e){}
+        try { if (window.Shopify && window.Shopify.theme && window.Shopify.theme.cart && typeof window.Shopify.theme.cart.open === 'function') { window.Shopify.theme.cart.open(); return true; } } catch(e){}
+        var t = document.querySelector('[data-cart-toggle], [data-drawer="cart"], .js-drawer-open-cart, .drawer-toggle--cart, .open-cart-drawer, .header__cart button, .header__action-item--cart button, button[aria-controls="CartDrawer"]');
+        if (t) { try{ t.click(); return true; }catch(e){} }
+        var d = document.querySelector('[data-cart-drawer], #CartDrawer, .cart-drawer, .drawer--cart, .cart__drawer');
+        if (d){ d.classList.add('is-open','drawer--is-open','active'); d.removeAttribute('aria-hidden'); document.documentElement.classList.add('drawer-open','overflow-hidden'); var b=document.querySelector('.drawer__overlay,.cart-drawer__overlay,.modal-overlay'); if(b) b.classList.add('is-visible','active'); return true; }
+        return false;
+      }
+      function openCartDrawerAfterAdd(){
+        var n=0; (function again(){ var ok=openCartDrawerCore(); if(ok||++n>=6) return; setTimeout(again, n===1?0:n===2?80:n===3?120:n===4?200:n===5?300:500); })();
+      }
+
+      /* ===== 1) Cards COM form /cart/add ===== */
+      function patchCardsWithForm(){
+        var forms = root.querySelectorAll('form[action*="/cart/add"]');
+        forms.forEach(function(form){
+          if(form.classList.contains('gx-dual-ready')) return;
+
+          var buyBtn = form.querySelector('button[name="add"], button[type="submit"], .button[name="add"], .button--primary');
+          if(!buyBtn) return;
+
+          var row = document.createElement('div');
+          row.className = 'gx-dual-cta';
+          buyBtn.parentNode.insertBefore(row, buyBtn);
+          row.appendChild(buyBtn);
+          buyBtn.classList.add('gx-buy');
+
+          // COMPRAR => PDP
+          buyBtn.type = 'button';
+          buyBtn.textContent = "{{ section.settings.buy_now_text | escape }}";
+          buyBtn.addEventListener('click', function(){
+            var card = getCard(form);
+            var link = getProductLink(card);
+            if(link && link.href) window.location.href = link.href;
+          });
+
+          // MINI => add + drawer
+          var mini = document.createElement('button');
+          mini.type = 'button';
+          mini.className = 'gx-addtocart-mini';
+          mini.setAttribute('aria-label','Adicionar ao carrinho');
+          mini.appendChild(cartIcon());
+          row.appendChild(mini);
+
+          mini.addEventListener('click', function(e){
+            e.preventDefault(); e.stopPropagation();
+            var idInput = form.querySelector('input[name="id"]');
+            var qtyInput = form.querySelector('input[name="quantity"]');
+            var id = idInput && idInput.value;
+            var qty = qtyInput ? parseInt(qtyInput.value,10) || 1 : 1;
+
+            if(!id){ // sem variante selecionada no card -> PDP
+              var card = getCard(form);
+              var link = getProductLink(card);
+              if(link && link.href) window.location.href = link.href;
+              return;
+            }
+
+            mini.disabled = true;
+            fetch('/cart/add.js', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json','Accept':'application/json'},
+              body: JSON.stringify({ id:id, quantity:qty })
+            })
+            .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+            .then(function(){ mini.classList.add('gx-added'); openCartDrawerAfterAdd(); })
+            .catch(function(){ mini.classList.add('gx-error'); })
+            .finally(function(){ setTimeout(function(){ mini.classList.remove('gx-added','gx-error'); mini.disabled=false; }, 1200); });
+          });
+
+          form.classList.add('gx-dual-ready');
+        });
+      }
+
+      /* ===== 2) Cards SEM form (variação, indisponíveis, etc.) ===== */
+      function patchCardsWithoutForm(){
+        // pega CTAs visíveis que NÃO estejam dentro de um form
+        var ctas = root.querySelectorAll('a.button, button.button, .button--primary, .product-item__cta .button, .product-card__cta .button');
+        ctas.forEach(function(cta){
+          if (cta.closest('form[action*="/cart/add"]')) return; // já tratado
+          if (cta.dataset.gxPatched === '1') return;
+
+          var card = getCard(cta);
+          if (!card) return;
+
+          var row = document.createElement('div');
+          row.className = 'gx-dual-cta';
+          cta.parentNode.insertBefore(row, cta);
+          row.appendChild(cta);
+
+          // botão principal -> PDP
+          cta.classList.add('gx-buy');
+          cta.setAttribute('type','button');
+          cta.textContent = "{{ section.settings.buy_now_text | escape }}";
+          cta.addEventListener('click', function(){
+            var link = getProductLink(card);
+            if (link && link.href) window.location.href = link.href;
+          });
+
+          // mini -> PDP (precisa escolher variação)
+          var mini = document.createElement('button');
+          mini.type = 'button';
+          mini.className = 'gx-addtocart-mini';
+          mini.setAttribute('aria-label','Selecionar variação');
+          mini.appendChild(cartIcon());
+          row.appendChild(mini);
+
+          mini.addEventListener('click', function(e){
+            e.preventDefault();
+            var link = getProductLink(card);
+            if (link && link.href) window.location.href = link.href;
+          });
+
+          cta.dataset.gxPatched = '1';
+          card.classList.add('gx-dualized');
+        });
+      }
+
+      function patchAll(){
+        patchCardsWithForm();
+        patchCardsWithoutForm();
+      }
+
+      // roda agora e também quando a seção recarregar no editor
+      patchAll();
+      document.addEventListener('shopify:section:load', function(e){
+        if (e && e.detail && e.detail.sectionId === '{{ section.id }}') patchAll();
+      });
+    })();
+  </script>
+
+  {%- comment -%}
+  --------------------------------------------------------------------------------------
+  QUICK VIEW CONTAINER
+  --------------------------------------------------------------------------------------
+  {%- endcomment -%}
+  <div id="modal-quick-view-{{ section.id }}" class="modal" aria-hidden="true">
+    <div class="modal__dialog modal__dialog--stretch" role="dialog">
+      <button class="modal__close link" data-action="close-modal">{%- render 'icon', icon: 'close' -%}</button>
+      <div class="modal__loader">
+        {%- render 'icon', icon: 'search-loader' -%}
+      </div>
+      <div class="modal__inner"></div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "settings": [
+    { "type": "range", "id": "overlap_px", "label": "Tamanho da sobreposição (px)", "min": 0, "max": 80, "step": 2, "default": 0 },
+    { "type": "range", "id": "overlap_px_mobile", "label": "Tamanho da sobreposição (px) — mobile", "min": 0, "max": 80, "step": 2, "default": 0 },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Featured collection" },
+    { "type": "range", "id": "products_count", "label": "Products to show", "min": 4, "max": 50, "step": 1, "default": 12 },
+    { "type": "select", "id": "layout", "label": "Layout", "options": [
+      { "value": "vertical", "label": "Vertical" },
+      { "value": "horizontal", "label": "Horizontal" },
+      { "value": "collage", "label": "Collage" }
+    ], "default": "vertical" },
+    { "type": "checkbox", "id": "stack_desktop", "label": "Stack products on desktop", "info": "Only applicable if layout is set to vertical", "default": false },
+    { "type": "checkbox", "id": "show_quick_buy", "label": "Show quick buy", "default": false, "info": "Only shows if layout is set to vertical" },
+    { "type": "text", "id": "link_title", "label": "Link title", "default": "View all" },
+    { "type": "url", "id": "link_url", "label": "Link URL", "info": "If empty, the collection URL is used." },
+
+    /* ====== CONTROLES DO NOVO BOTÃO LATERAL ====== */
+    { "type": "header", "content": "Adicionar ao carrinho (botão lateral)" },
+    { "type": "color", "id": "mini_btn_bg", "label": "Cor de fundo", "default": "#ffffff" },
+    { "type": "color", "id": "mini_btn_text", "label": "Cor do ícone/texto", "default": "#1f2937" },
+    { "type": "color", "id": "mini_btn_border", "label": "Cor da borda", "default": "#e5e7eb" },
+    { "type": "color", "id": "mini_btn_bg_hover", "label": "Fundo (hover)", "default": "#f3f4f6" },
+    { "type": "color", "id": "mini_btn_text_hover", "label": "Ícone/texto (hover)", "default": "#111827" },
+    { "type": "range", "id": "buy_basis_desktop", "label": "Largura do botão Comprar (desktop) %", "min": 60, "max": 90, "step": 1, "default": 78 },
+    { "type": "range", "id": "buy_basis_mobile", "label": "Largura do botão Comprar (mobile) %", "min": 60, "max": 90, "step": 1, "default": 74 },
+
+    /* ====== CONTROLES DO BOTÃO COMPRAR ====== */
+    { "type": "header", "content": "Botão 'Comprar'" },
+    { "type": "text", "id": "buy_now_text", "label": "Texto do botão", "default": "Comprar" },
+    { "type": "color", "id": "buy_now_bg", "label": "Cor de fundo", "default": "#00C65E" },
+    { "type": "color", "id": "buy_now_text_color", "label": "Cor do texto", "default": "#FFFFFF" },
+    { "type": "color", "id": "buy_now_bg_hover", "label": "Cor de fundo (hover)", "default": "#00A653" }
+  ],
+  "presets": [
+    { "category": "Collection", "name": "Featured collection", "settings": {} }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,450 @@
+{% comment %} 
+Royal • UGC Vídeos + Produto (YouTube OK) — FIX INTERAÇÃO + ÁUDIO
+- ✅ Controles e “arrastar” (scrub) funcionando (controls / controlsList)
+- ✅ Áudio: opção global + por bloco (mudo opcional)
+- ✅ Autoplay seguro: quando autoplay ligado, força muted (exigência do navegador)
+- ✅ Clique no vídeo não “passa” pro scroll do carrossel (touch-action)
+{% endcomment %}
+
+<section id="royal-ugc-{{ section.id }}" class="royal-ugc">
+  {% render 'royal-overlap', id: section.id %}
+
+  {% liquid
+    assign cards = section.blocks | where: 'type', 'card'
+  %}
+
+  <style>
+    #royal-ugc-{{ section.id }}{
+      --bg: {{ section.settings.bg | default: '#F6D8E6' }};
+      --card-radius: {{ section.settings.card_radius | default: 34 }}px;
+
+      --card-w-d: {{ section.settings.card_width_desktop | default: 280 }}px;
+      --card-w-m: {{ section.settings.card_width_mobile | default: 245 }}px;
+
+      --card-h-d: {{ section.settings.card_height_desktop | default: 520 }}px;
+      --card-h-m: {{ section.settings.card_height_mobile | default: 470 }}px;
+
+      --gap: {{ section.settings.gap | default: 26 }}px;
+
+      --per-d: {{ section.settings.per_view_desktop | default: 4 }};
+      --per-m: {{ section.settings.per_view_mobile | default: 2 }};
+      --peek-m: {{ section.settings.peek_mobile | default: 0.3 }};
+
+      --text: {{ section.settings.text_color | default: '#1a1a1a' }};
+      --muted: rgba(0,0,0,.62);
+
+      padding: {{ section.settings.pad_y | default: 26 }}px 0;
+      background: var(--bg);
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    #royal-ugc-{{ section.id }} .page-width{
+      width: 100%;
+      max-width: 1480px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: var(--mobile-container-gutter, 20px);
+      padding-right: var(--mobile-container-gutter, 20px);
+    }
+    @media (min-width: 641px) and (max-width: 1023px){
+      #royal-ugc-{{ section.id }} .page-width{
+        padding-left: var(--tablet-container-gutter, 28px);
+        padding-right: var(--tablet-container-gutter, 28px);
+      }
+    }
+    @media (min-width: 1024px){
+      #royal-ugc-{{ section.id }} .page-width{
+        padding-left: var(--desktop-container-gutter, 36px);
+        padding-right: var(--desktop-container-gutter, 36px);
+      }
+    }
+
+    #royal-ugc-{{ section.id }} .head{ margin-bottom: 12px; color: var(--text); }
+    #royal-ugc-{{ section.id }} .title{
+      margin:0; font-weight: 800;
+      font-size: clamp(18px, 2.2vw, 28px);
+      line-height: 1.1;
+    }
+    #royal-ugc-{{ section.id }} .subtitle{
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    /* ===== TRACK ===== */
+    #royal-ugc-{{ section.id }} .viewport{ position: relative; }
+    #royal-ugc-{{ section.id }} .track{
+      display:flex;
+      gap: var(--gap);
+      overflow-x:auto;
+      overflow-y:hidden;
+      padding: 14px 2px 6px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width:none;
+      -ms-overflow-style:none;
+      overscroll-behavior-x: contain;
+    }
+    #royal-ugc-{{ section.id }} .track::-webkit-scrollbar{ display:none; }
+
+    /* ===== CARD ===== */
+    #royal-ugc-{{ section.id }} .ugc-card{
+      scroll-snap-align: start;
+      flex: 0 0 auto;
+      width: clamp(
+        220px,
+        calc((100% - (var(--gap) * (var(--per-d) - 1))) / var(--per-d)),
+        var(--card-w-d)
+      );
+      color: var(--text);
+    }
+
+    /* vídeo */
+    #royal-ugc-{{ section.id }} .ugc-media{
+      width: 100%;
+      height: var(--card-h-d);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      background: rgba(255,255,255,.25);
+      box-shadow: 0 14px 34px rgba(0,0,0,.12);
+      position: relative;
+      isolation: isolate;
+
+      /* MUITO IMPORTANTE: permite o “scrub” sem o carrossel capturar o toque */
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    /* wrapper para embed ocupar tudo */
+    #royal-ugc-{{ section.id }} .ugc-embed{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+    }
+
+    #royal-ugc-{{ section.id }} .ugc-embed iframe,
+    #royal-ugc-{{ section.id }} .ugc-embed video{
+      width:100% !important;
+      height:100% !important;
+      display:block;
+      border:0;
+      object-fit: cover;
+      background:#000;
+
+      /* permite interagir */
+      pointer-events: auto;
+    }
+
+    #royal-ugc-{{ section.id }} .ugc-media iframe{
+      position:absolute;
+      inset:0;
+    }
+
+    #royal-ugc-{{ section.id }} .ugc-media img{
+      width: 100%;
+      height: 100%;
+      display:block;
+      object-fit: cover;
+    }
+
+    /* ===== produto embaixo ===== */
+    #royal-ugc-{{ section.id }} .ugc-bottom{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      margin-top: 10px;
+      text-decoration: none;
+      color: var(--text);
+      min-height: 34px;
+    }
+
+    #royal-ugc-{{ section.id }} .prod-thumb{
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      overflow:hidden;
+      background:#fff;
+      box-shadow: 0 6px 14px rgba(0,0,0,.10);
+      flex: 0 0 auto;
+    }
+    #royal-ugc-{{ section.id }} .prod-thumb img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+
+    #royal-ugc-{{ section.id }} .ugc-txt{
+      display:flex;
+      flex-direction:column;
+      gap: 2px;
+      min-width: 0;
+      align-items:center;
+      text-align:center;
+    }
+    #royal-ugc-{{ section.id }} .handle{
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.1;
+      color: rgba(0,0,0,.65);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      max-width: 240px;
+    }
+    #royal-ugc-{{ section.id }} .prod-name{
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      max-width: 240px;
+    }
+
+    /* ===== MOBILE: sem sobrepor ===== */
+    @media (max-width: 989px){
+      #royal-ugc-{{ section.id }} .ugc-card{
+        width: clamp(
+          180px,
+          calc((100% - (var(--gap) * (var(--per-m) - 1))) / (var(--per-m) + var(--peek-m))),
+          var(--card-w-m)
+        );
+      }
+      #royal-ugc-{{ section.id }} .ugc-media{
+        height: var(--card-h-m);
+        border-radius: calc(var(--card-radius) - 6px);
+      }
+      #royal-ugc-{{ section.id }} .ugc-bottom{
+        flex-direction: column;
+        gap: 8px;
+        padding: 2px 6px 0;
+      }
+      #royal-ugc-{{ section.id }} .prod-thumb{
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+      }
+      #royal-ugc-{{ section.id }} .handle,
+      #royal-ugc-{{ section.id }} .prod-name{
+        max-width: 220px;
+      }
+    }
+  </style>
+
+  <div class="page-width">
+    {% if section.settings.title != blank or section.settings.subtitle != blank %}
+      <div class="head">
+        {% if section.settings.title != blank %}
+          <h2 class="title">{{ section.settings.title }}</h2>
+        {% endif %}
+        {% if section.settings.subtitle != blank %}
+          <div class="subtitle">{{ section.settings.subtitle }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="viewport">
+      <div class="track">
+        {% for block in cards %}
+          {% liquid
+            assign p = block.settings.product
+            assign url = ''
+            assign p_title = block.settings.product_title_override
+            assign thumb = block.settings.product_thumb_override
+
+            if p != blank
+              assign url = p.url
+              if p_title == blank
+                assign p_title = p.title
+              endif
+              if thumb == blank and p.featured_image
+                assign thumb = p.featured_image
+              endif
+            endif
+
+            assign yt = block.settings.youtube
+            assign yt_id = ''
+
+            if yt != blank
+              assign yt_id = yt.id
+              if yt_id == blank
+                assign yt_raw = yt | append: '' | strip
+                if yt_raw contains 'youtu.be/'
+                  assign yt_id = yt_raw | split: 'youtu.be/' | last | split: '?' | first | split: '&' | first
+                elsif yt_raw contains 'youtube.com/shorts/'
+                  assign yt_id = yt_raw | split: 'youtube.com/shorts/' | last | split: '?' | first | split: '&' | first
+                elsif yt_raw contains 'youtube.com/watch'
+                  assign yt_id = yt_raw | split: 'v=' | last | split: '?' | first | split: '&' | first
+                elsif yt_raw contains 'youtube.com/embed/'
+                  assign yt_id = yt_raw | split: 'youtube.com/embed/' | last | split: '?' | first | split: '&' | first
+                else
+                  assign yt_id = yt_raw | split: '?' | first | split: '&' | first
+                endif
+              endif
+            endif
+
+            assign shop_video = block.settings.shopify_video
+
+            assign want_controls = section.settings.controls
+            if block.settings.force_controls
+              assign want_controls = true
+            endif
+
+            assign want_muted = section.settings.muted
+            if block.settings.force_sound
+              assign want_muted = false
+            endif
+
+            assign want_autoplay = section.settings.autoplay
+            if want_autoplay and want_muted == false
+              assign want_muted = true
+            endif
+          %}
+
+          <div class="ugc-card" {{ block.shopify_attributes }}>
+            <div class="ugc-media">
+              {%- if shop_video != blank -%}
+                <div class="ugc-embed">
+                  {{ shop_video | video_tag:
+                    autoplay: want_autoplay,
+                    loop: section.settings.loop,
+                    muted: want_muted,
+                    controls: want_controls,
+                    playsinline: true,
+                    preload: 'metadata'
+                  }}
+                </div>
+
+              {%- elsif yt_id != blank -%}
+                <iframe
+                  src="https://www.youtube.com/embed/{{ yt_id }}?rel=0&modestbranding=1&playsinline=1{% if want_autoplay %}&autoplay=1{% endif %}{% if want_muted %}&mute=1{% endif %}{% if section.settings.loop %}&loop=1&playlist={{ yt_id }}{% endif %}{% if want_controls %}&controls=1{% else %}&controls=0{% endif %}"
+                  title="YouTube video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                ></iframe>
+
+              {%- elsif block.settings.embed_html != blank -%}
+                <div class="ugc-embed">
+                  {{ block.settings.embed_html }}
+                </div>
+
+              {%- elsif block.settings.video_mp4 != blank -%}
+                <video
+                  playsinline
+                  webkit-playsinline
+                  {% if want_autoplay %}autoplay{% endif %}
+                  {% if want_muted %}muted{% endif %}
+                  {% if section.settings.loop %}loop{% endif %}
+                  {% if want_controls %}controls{% endif %}
+                  controlslist="nodownload noplaybackrate"
+                  preload="metadata"
+                >
+                  <source src="{{ block.settings.video_mp4 | strip }}" type="video/mp4">
+                </video>
+
+              {%- elsif block.settings.poster != blank -%}
+                <img src="{{ block.settings.poster | image_url: width: 1200 }}" alt="Vídeo UGC" loading="lazy" width="1200" height="1200">
+              {%- else -%}
+                <div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;background:#222;">
+                  Adicione um vídeo no bloco
+                </div>
+              {%- endif -%}
+            </div>
+
+            {%- if p != blank -%}
+              <a class="ugc-bottom" href="{{ url }}">
+                <span class="prod-thumb">
+                  {% if thumb != blank %}
+                    <img src="{{ thumb | image_url: width: 120 }}" alt="{{ p_title | escape }}" loading="lazy" width="120" height="120">
+                  {% endif %}
+                </span>
+
+                <span class="ugc-txt">
+                  {% if block.settings.handle != blank %}
+                    <span class="handle">{{ block.settings.handle }}</span>
+                  {% endif %}
+                  <span class="prod-name">{{ p_title }}</span>
+                </span>
+              </a>
+            {%- else -%}
+              <div class="ugc-bottom" style="opacity:.65;pointer-events:none;">
+                <span class="ugc-txt">
+                  <span class="handle">Selecione um produto</span>
+                  <span class="prod-name">no bloco</span>
+                </span>
+              </div>
+            {%- endif -%}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Royal • UGC + Produto",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Título", "default": "Quem usa, recomenda 💖" },
+    { "type": "text", "id": "subtitle", "label": "Subtítulo", "default": "Assista e clique no produto abaixo de cada vídeo" },
+    { "type": "color", "id": "bg", "label": "Cor de fundo", "default": "#F6D8E6" },
+    { "type": "color", "id": "text_color", "label": "Cor do texto", "default": "#1a1a1a" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "per_view_desktop", "label": "Cards por tela (desktop)", "min": 2, "max": 7, "step": 1, "default": 4 },
+    { "type": "range", "id": "per_view_mobile", "label": "Cards cheios por tela (mobile)", "min": 1, "max": 3, "step": 1, "default": 2 },
+    { "type": "range", "id": "peek_mobile", "label": "Beirinha do próximo (mobile)", "min": 0.0, "max": 0.9, "step": 0.1, "default": 0.3, "info": "0.0 = sem beirinha. 0.3 = mostra ~30% do próximo card." },
+
+    { "type": "header", "content": "Tamanho do card" },
+    { "type": "range", "id": "card_width_desktop", "label": "Largura máx do card (desktop)", "min": 220, "max": 520, "step": 5, "default": 280 },
+    { "type": "range", "id": "card_width_mobile", "label": "Largura máx do card (mobile)", "min": 180, "max": 420, "step": 5, "default": 245 },
+    { "type": "range", "id": "card_height_desktop", "label": "Altura do vídeo (desktop)", "min": 360, "max": 760, "step": 10, "default": 520 },
+    { "type": "range", "id": "card_height_mobile", "label": "Altura do vídeo (mobile)", "min": 320, "max": 720, "step": 10, "default": 470 },
+    { "type": "range", "id": "card_radius", "label": "Arredondamento", "min": 12, "max": 60, "step": 1, "default": 34 },
+    { "type": "range", "id": "gap", "label": "Espaçamento entre cards", "min": 10, "max": 40, "step": 1, "default": 26 },
+    { "type": "range", "id": "pad_y", "label": "Padding vertical (seção)", "min": 0, "max": 60, "step": 2, "default": 26 },
+
+    { "type": "header", "content": "Playback" },
+    { "type": "checkbox", "id": "autoplay", "label": "Autoplay", "default": true },
+    { "type": "checkbox", "id": "muted", "label": "Iniciar mudo", "default": true },
+    { "type": "checkbox", "id": "loop", "label": "Loop", "default": true },
+    { "type": "checkbox", "id": "controls", "label": "Mostrar controles", "default": true }
+  ],
+
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Vídeo + Produto",
+      "settings": [
+        { "type": "text", "id": "handle", "label": "@ do criador", "default": "@creator" },
+
+        { "type": "header", "content": "Vídeo" },
+        { "type": "video", "id": "shopify_video", "label": "Upload do vídeo" },
+        { "type": "video_url", "id": "youtube", "label": "YouTube (URL)", "accept": ["youtube"], "info": "Cole o link completo." },
+        { "type": "text", "id": "video_mp4", "label": "OU link MP4 direto" },
+        { "type": "html", "id": "embed_html", "label": "OU embed HTML" },
+        { "type": "image_picker", "id": "poster", "label": "Imagem fallback" },
+
+        { "type": "header", "content": "Som/Controles" },
+        { "type": "checkbox", "id": "force_controls", "label": "Forçar controles", "default": true },
+        { "type": "checkbox", "id": "force_sound", "label": "Forçar som (sem autoplay)", "default": false },
+
+        { "type": "header", "content": "Produto" },
+        { "type": "product", "id": "product", "label": "Produto para linkar" },
+        { "type": "text", "id": "product_title_override", "label": "Nome do produto (opcional)", "default": "Nome do produto" },
+        { "type": "image_picker", "id": "product_thumb_override", "label": "Thumb personalizada (opcional)" }
+      ]
+    }
+  ],
+
+  "presets": [
+    { "name": "Royal • UGC + Produto" }
+  ]
+}
+{% endschema %}

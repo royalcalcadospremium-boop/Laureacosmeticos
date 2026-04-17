@@ -1,0 +1,172 @@
+{% comment %}
+WA Banner • Grupo WhatsApp
+Simples • Leve • 100% Shopify Safe
+{% endcomment %}
+
+<section id="wa-banner-{{ section.id }}" class="wa-banner">
+  <div class="wa-wrap">
+
+    <div class="wa-card">
+
+      {% if section.settings.image != blank %}
+        <div class="wa-img">
+          <img
+            src="{{ section.settings.image | image_url: width: 600 }}"
+            alt="Grupo WhatsApp"
+            loading="lazy">
+        </div>
+      {% endif %}
+
+      <div class="wa-text">
+        <h2>{{ section.settings.title }}</h2>
+        <p>{{ section.settings.subtitle }}</p>
+      </div>
+
+      <div class="wa-cta">
+        <a
+          href="{{ section.settings.link }}"
+          target="_blank"
+          class="wa-btn">
+          {{ section.settings.button }}
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <style>
+    #wa-banner-{{ section.id }}{
+      padding:40px 20px;
+      background:#fff;
+    }
+
+    .wa-wrap{
+      max-width:1200px;
+      margin:auto;
+    }
+
+    .wa-card{
+      background:{{ section.settings.bg }};
+      border-radius:24px;
+      padding:25px 30px;
+
+      display:flex;
+      align-items:center;
+      gap:25px;
+
+      box-shadow:0 10px 25px rgba(0,0,0,.06);
+    }
+
+    .wa-img img{
+      width:160px;
+      border-radius:16px;
+    }
+
+    .wa-text{
+      flex:1;
+    }
+
+    .wa-text h2{
+      margin:0;
+      font-size:26px;
+      font-weight:800;
+      color:#3a2a59;
+    }
+
+    .wa-text p{
+      margin-top:6px;
+      font-size:14px;
+      color:#6b5b84;
+    }
+
+    .wa-btn{
+      display:inline-block;
+      background:{{ section.settings.btn_color }};
+      color:#fff;
+      padding:12px 26px;
+      border-radius:50px;
+      font-weight:700;
+      text-decoration:none;
+      transition:.2s;
+    }
+
+    .wa-btn:hover{
+      transform:translateY(-2px);
+    }
+
+    /* mobile */
+    @media(max-width:768px){
+      .wa-card{
+        flex-direction:column;
+        text-align:center;
+      }
+
+      .wa-img img{
+        width:130px;
+      }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "WA Banner",
+  "settings": [
+
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagem esquerda"
+    },
+
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Acesse nosso grupo"
+    },
+
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Descubra ofertas secretas no WhatsApp"
+    },
+
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link do grupo WhatsApp"
+    },
+
+    {
+      "type": "text",
+      "id": "button",
+      "label": "Texto do botão",
+      "default": "Entrar agora"
+    },
+
+    {
+      "type": "color",
+      "id": "bg",
+      "label": "Cor do banner",
+      "default": "#FAD6E6"
+    },
+
+    {
+      "type": "color",
+      "id": "btn_color",
+      "label": "Cor do botão",
+      "default": "#E61C78"
+    }
+
+  ],
+  "presets": [
+    {
+      "name": "WA Banner"
+    }
+  ]
+}
+{% endschema %}
+

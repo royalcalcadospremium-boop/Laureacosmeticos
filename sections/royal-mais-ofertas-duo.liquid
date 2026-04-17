@@ -1,0 +1,772 @@
+{% comment %}
+Royal • Tabs Cards (v1.3.1) — SEM CORAÇÃO + FOTO FULL-BLEED 50% DO CARD
+- ✅ Remove coração de favorito (CSS kill-switch, funciona mesmo se vier do snippet)
+- ✅ Imagem ocupa TODA a parte superior (sem margens laterais/superior)
+- ✅ Área da imagem = 50% da altura do card (respeita --card-h)
+- ✅ Sem deformar imagem (object-fit: cover)
+{% endcomment %}
+
+<section id="royal-tabs-cards-{{ section.id }}" class="royal-tabs-cards">
+  {% render 'royal-overlap', id: section.id %}
+
+  {% liquid
+    assign tabs = section.blocks | where: 'type', 'tab'
+    assign fallback_tab = false
+    if tabs.size == 0
+      assign fallback_tab = true
+    endif
+  %}
+
+  <style>
+    #royal-tabs-cards-{{ section.id }}{
+      --bg: {{ section.settings.bg | default: '#FAD6E6' }};
+      --card: {{ section.settings.card_bg | default: '#FFEAF3' }};
+      --radius: {{ section.settings.card_radius | default: 34 }}px;
+      --gap: {{ section.settings.gap | default: 18 }}px;
+
+      --pill-bg: {{ section.settings.pill_bg | default: '#E7E7E7' }};
+      --pill-active: {{ section.settings.pill_active_bg | default: '#F01980' }};
+      --pill-text: {{ section.settings.pill_text | default: '#2B2B2B' }};
+      --pill-active-text: {{ section.settings.pill_active_text | default: '#FFFFFF' }};
+
+      --btn: {{ section.settings.btn_bg | default: '#B7F25A' }};
+      --btn-text: {{ section.settings.btn_text | default: '#16310D' }};
+
+      --badge: {{ section.settings.badge_bg | default: '#B7F25A' }};
+      --badge-text: {{ section.settings.badge_text | default: '#16310D' }};
+
+      --title: {{ section.settings.title_color | default: '#1F2A44' }};
+      --muted: {{ section.settings.muted_color | default: '#6B7280' }};
+      --price: {{ section.settings.price_color | default: '#1F2A44' }};
+      --compare: {{ section.settings.compare_color | default: '#F01980' }};
+
+      /* Quantidade por tela */
+      --per-d: {{ section.settings.per_view_desktop | default: 4 }};
+      --per-m: {{ section.settings.per_view_mobile | default: '2' }};
+      --peek-m: {{ section.settings.peek_mobile | default: 0.2 }};
+
+      /* Altura do card */
+      --card-h: {{ section.settings.card_height | default: 520 }}px;
+
+      /* Padding interno do card (mantém layout premium) */
+      --card-pad: 14px;
+
+      background: var(--bg);
+      position: relative;
+      z-index: 3;
+      isolation: isolate;
+      padding: {{ section.settings.section_padding_y | default: 26 }}px 0;
+    }
+
+    /* ===== Alinhamento com o container global do tema ===== */
+    #royal-tabs-cards-{{ section.id }} .container{
+      width: 100%;
+      max-width: 1480px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: var(--mobile-container-gutter, 20px);
+      padding-right: var(--mobile-container-gutter, 20px);
+    }
+    @media (min-width: 641px) and (max-width: 1023px){
+      #royal-tabs-cards-{{ section.id }} .container{
+        padding-left: var(--tablet-container-gutter, 28px);
+        padding-right: var(--tablet-container-gutter, 28px);
+      }
+    }
+    @media (min-width: 1024px){
+      #royal-tabs-cards-{{ section.id }} .container{
+        padding-left: var(--desktop-container-gutter, 36px);
+        padding-right: var(--desktop-container-gutter, 36px);
+      }
+    }
+    /* ====================================================== */
+
+    /* Tabs (pílulas) */
+    #royal-tabs-cards-{{ section.id }} .tabsbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:flex-start;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+      padding: 8px 0 16px;
+    }
+    #royal-tabs-cards-{{ section.id }} .tabsbar::-webkit-scrollbar{ display:none; }
+
+    #royal-tabs-cards-{{ section.id }} .tabbtn{
+      flex:0 0 auto;
+      border:0;
+      background: var(--pill-bg);
+      color: var(--pill-text);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 800;
+      font-size: 14px;
+      line-height: 1;
+      cursor:pointer;
+      white-space: nowrap;
+      transition: transform .12s ease, background .12s ease, color .12s ease;
+    }
+    #royal-tabs-cards-{{ section.id }} .tabbtn[aria-selected="true"]{
+      background: var(--pill-active);
+      color: var(--pill-active-text);
+    }
+    #royal-tabs-cards-{{ section.id }} .tabbtn:active{ transform: scale(.98); }
+
+    /* Carrossel */
+    #royal-tabs-cards-{{ section.id }} .viewport{ position:relative; overflow:hidden; }
+    #royal-tabs-cards-{{ section.id }} .track{
+      display:flex; gap:var(--gap);
+      overflow-x:auto; scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none; -ms-overflow-style:none;
+      padding-bottom: 6px;
+    }
+    #royal-tabs-cards-{{ section.id }} .track::-webkit-scrollbar{ display:none; }
+
+    #royal-tabs-cards-{{ section.id }} .panel{ display:none; }
+    #royal-tabs-cards-{{ section.id }} .panel.is-active{ display:block; }
+
+    #royal-tabs-cards-{{ section.id }} .slide{
+      position:relative;
+      flex:0 0 calc((100% - (var(--gap) * (var(--per-d) - 1))) / var(--per-d));
+      min-width: calc((100% - (var(--gap) * (var(--per-d) - 1))) / var(--per-d));
+      scroll-snap-align:start;
+    }
+
+    /* Mobile com peek */
+    @media (max-width: 989px){
+      #royal-tabs-cards-{{ section.id }}{ --gap: 14px; }
+      #royal-tabs-cards-{{ section.id }} .slide{
+        flex-basis: calc((100% - (var(--gap) * (var(--per-m) - 1))) / (var(--per-m) + var(--peek-m)));
+        min-width:  calc((100% - (var(--gap) * (var(--per-m) - 1))) / (var(--per-m) + var(--peek-m)));
+      }
+    }
+
+    /* =========================
+       CARD (premium)
+       - Topo: imagem FULL-BLEED (50% do card)
+       - Conteúdo: mantém padding
+       ========================= */
+    #royal-tabs-cards-{{ section.id }} .card{
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: var(--card-pad);
+      box-shadow: 0 18px 40px rgba(31, 42, 68, .12);
+      height: var(--card-h);
+      display:flex;
+      flex-direction:column;
+      justify-content: flex-start;
+      gap: 8px;
+      overflow: hidden; /* garante canto arredondado no full-bleed */
+    }
+
+    /* ✅ Remove coração (mesmo se vier do snippet) */
+    #royal-tabs-cards-{{ section.id }} .heart{ display:none !important; }
+
+    /* Topo full-bleed: remove margens laterais/superior sem mexer no resto */
+    #royal-tabs-cards-{{ section.id }} .toprow{
+      position:relative;
+      overflow:hidden;
+
+      /* full-bleed dentro do card com padding */
+      margin-top: calc(var(--card-pad) * -1);
+      margin-left: calc(var(--card-pad) * -1);
+      margin-right: calc(var(--card-pad) * -1);
+
+      /* 50% da altura do card */
+      height: calc(var(--card-h) * 0.5);
+
+      /* cantos de cima arredondados */
+      border-top-left-radius: var(--radius);
+      border-top-right-radius: var(--radius);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+
+      display:flex;
+      align-items:stretch;
+      justify-content:stretch;
+      padding: 0;
+      min-height: 0;
+      background: rgba(255,255,255,.18);
+    }
+
+    /* Badge %OFF (top-left) */
+    #royal-tabs-cards-{{ section.id }} .badge{
+      position:absolute;
+      left: 12px;
+      top: 12px;
+      background: var(--badge);
+      color: var(--badge-text);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-weight: 900;
+      font-size: 12px;
+      line-height: 1;
+      z-index: 3;
+    }
+
+    /* Imagem: ocupa 100% da área do topo, sem deformar */
+    #royal-tabs-cards-{{ section.id }} .imgwrap{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display:block;
+      padding: 0;
+      margin: 0;
+    }
+    #royal-tabs-cards-{{ section.id }} .imgwrap img,
+    #royal-tabs-cards-{{ section.id }} .imgwrap svg{
+      width: 100% !important;
+      height: 100% !important;
+      display:block;
+    }
+    #royal-tabs-cards-{{ section.id }} .imgwrap img{
+      object-fit: cover;  /* preenche sem deformar (pode cortar) */
+      object-position: center;
+      transform: translateZ(0);
+    }
+
+    /* Título: 2 linhas + ... */
+    #royal-tabs-cards-{{ section.id }} .title{
+      font-weight: 900;
+      color: var(--title);
+      font-size: 16px;
+      line-height: 1.2;
+      text-align:center;
+      margin-top: 2px;
+      padding: 0 8px;
+
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-height: calc(2 * 1.2em);
+    }
+
+    #royal-tabs-cards-{{ section.id }} .prices{
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      gap: 4px;
+      padding: 0 6px;
+      margin-bottom: 6px;
+    }
+    #royal-tabs-cards-{{ section.id }} .compare{
+      color: var(--compare);
+      font-weight: 800;
+      font-size: 12px;
+      text-decoration: line-through;
+      opacity: .95;
+      min-height: 16px;
+    }
+    #royal-tabs-cards-{{ section.id }} .now{
+      color: var(--price);
+      font-weight: 950;
+      font-size: 20px;
+      letter-spacing: -0.2px;
+    }
+    #royal-tabs-cards-{{ section.id }} .installments{
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    /* Botão Comprar */
+    #royal-tabs-cards-{{ section.id }} .buyform{ margin-top: 4px; }
+    #royal-tabs-cards-{{ section.id }} .buybtn{
+      width: 100%;
+      border: 0;
+      border-radius: 999px;
+      background: var(--btn);
+      color: var(--btn-text);
+      padding: 14px 16px;
+      font-weight: 950;
+      font-size: 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      cursor:pointer;
+      box-shadow: 0 10px 22px rgba(22, 49, 13, .15);
+      transition: transform .12s ease, filter .12s ease;
+    }
+    #royal-tabs-cards-{{ section.id }} .buybtn:active{ transform: scale(.99); }
+    #royal-tabs-cards-{{ section.id }} .buybtn svg{
+      width: 18px; height: 18px;
+      fill: none;
+      stroke: var(--btn-text);
+      stroke-width: 2.2;
+    }
+
+    @media (max-width: 580px){
+      #royal-tabs-cards-{{ section.id }} .title{ font-size: 15px; }
+      #royal-tabs-cards-{{ section.id }} .now{ font-size: 19px; }
+      #royal-tabs-cards-{{ section.id }} .toprow{ height: calc(var(--card-h) * 0.5); }
+    }
+
+    /* ===== MODAL VARIANTES ===== */
+    #rtc-modal-{{ section.id }}{
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: none;
+    }
+    #rtc-modal-{{ section.id }}.is-open{ display:block; }
+    #rtc-modal-{{ section.id }} .rtc-overlay{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(3px);
+    }
+    #rtc-modal-{{ section.id }} .rtc-panel{
+      position:absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: min(460px, calc(100vw - 32px));
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.25);
+      padding: 16px;
+    }
+    @media (max-width: 640px){
+      #rtc-modal-{{ section.id }} .rtc-panel{
+        right: 12px; left: 12px; width: auto;
+        top: auto; bottom: 12px; transform: none;
+      }
+    }
+    #rtc-modal-{{ section.id }} .rtc-close{
+      position:absolute;
+      top: 10px; right: 10px;
+      width: 34px; height: 34px;
+      border-radius: 999px;
+      border: 0;
+      background: rgba(0,0,0,.06);
+      cursor: pointer;
+      font-weight: 900;
+    }
+    #rtc-modal-{{ section.id }} .rtc-head{
+      display:flex; gap: 12px; align-items:center;
+      padding-right: 40px;
+    }
+    #rtc-modal-{{ section.id }} .rtc-media{
+      width: 70px; height: 70px;
+      border-radius: 16px;
+      overflow:hidden;
+      background: rgba(0,0,0,.04);
+      display:flex; align-items:center; justify-content:center;
+      flex: 0 0 auto;
+    }
+    #rtc-modal-{{ section.id }} .rtc-media img{ width:100%; height:100%; object-fit: cover; }
+    #rtc-modal-{{ section.id }} .rtc-title{ font-weight: 900; font-size: 15px; line-height: 1.2; }
+    #rtc-modal-{{ section.id }} .rtc-link{
+      display:inline-block; margin-top: 4px;
+      font-weight: 800; font-size: 13px;
+      text-decoration: underline; color:#111; opacity:.75;
+    }
+    #rtc-modal-{{ section.id }} .rtc-body{
+      margin-top: 14px;
+      display:flex; flex-direction:column; gap: 14px;
+    }
+    #rtc-modal-{{ section.id }} .rtc-opt{
+      border: 1px solid rgba(0,0,0,.10);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    #rtc-modal-{{ section.id }} .rtc-opt__label{
+      font-weight: 900; font-size: 13px; margin-bottom: 10px;
+    }
+    #rtc-modal-{{ section.id }} .rtc-grid{
+      display:flex; flex-wrap: wrap; gap: 10px;
+    }
+    #rtc-modal-{{ section.id }} .rtc-pill{
+      border: 1px solid rgba(0,0,0,.14);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 900;
+      font-size: 13px;
+      cursor:pointer;
+      background:#fff;
+      line-height: 1;
+    }
+    #rtc-modal-{{ section.id }} .rtc-pill[aria-pressed="true"]{
+      border-color: #111;
+      box-shadow: 0 6px 18px rgba(0,0,0,.12);
+    }
+    #rtc-modal-{{ section.id }} .rtc-foot{ margin-top: 14px; }
+    #rtc-modal-{{ section.id }} .rtc-confirm{
+      width: 100%;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 16px;
+      font-weight: 950;
+      font-size: 16px;
+      cursor:pointer;
+      background: var(--btn);
+      color: var(--btn-text);
+    }
+    #rtc-modal-{{ section.id }} .rtc-confirm:disabled{ opacity:.55; cursor:not-allowed; }
+  </style>
+
+  <div class="container">
+    {% unless section.settings.hide_tabs %}
+      <div class="tabsbar" role="tablist" aria-label="Categorias">
+        {% if fallback_tab %}
+          <button class="tabbtn" type="button" aria-selected="true">Oferta 🔥</button>
+        {% else %}
+          {% for b in tabs %}
+            <button class="tabbtn" type="button" role="tab"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              data-tab="{{ b.id }}">
+              {{ b.settings.label }}
+            </button>
+          {% endfor %}
+        {% endif %}
+      </div>
+    {% endunless %}
+
+    {% if fallback_tab %}
+      {% assign coll = section.settings.collection_fallback %}
+      <div class="panel is-active">
+        <div class="viewport">
+          <div class="track">
+            {% if coll and coll.products_count > 0 %}
+              {% for product in coll.products limit: section.settings.products_count %}
+                {% render 'royal-tabs-cards-item', product: product %}
+              {% endfor %}
+            {% else %}
+              {% for i in (1..section.settings.products_count) %}
+                <div class="slide">
+                  <div class="card">
+                    <div class="toprow">
+                      <span class="badge">-28%</span>
+                      <div class="imgwrap">{{ 'product-1' | placeholder_svg_tag }}</div>
+                    </div>
+                    <div class="title">Produto exemplo com nome muito grande pra mostrar o efeito de duas linhas...</div>
+                    <div class="prices">
+                      <div class="compare">De: R$ 387,00</div>
+                      <div class="now">Por: R$ 279,00</div>
+                      <div class="installments">ou até 6× R$ 46,50</div>
+                    </div>
+                    <div class="buyform">
+                      <a class="buybtn" href="/collections/all">Comprar</a>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% else %}
+      {% for b in tabs %}
+        {% assign coll = b.settings.collection %}
+        <div class="panel {% if forloop.first %}is-active{% endif %}" data-panel="{{ b.id }}">
+          <div class="viewport">
+            <div class="track">
+              {% if coll and coll.products_count > 0 %}
+                {% for product in coll.products limit: section.settings.products_count %}
+                  {% render 'royal-tabs-cards-item', product: product %}
+                {% endfor %}
+              {% else %}
+                {% for i in (1..section.settings.products_count) %}
+                  <div class="slide">
+                    <div class="card">
+                      <div class="toprow">
+                        <span class="badge">-28%</span>
+                        <div class="imgwrap">{{ 'product-1' | placeholder_svg_tag }}</div>
+                      </div>
+                      <div class="title">{{ b.settings.label }} — Produto exemplo com nome grande para cortar em duas linhas...</div>
+                      <div class="prices">
+                        <div class="compare">De: R$ 387,00</div>
+                        <div class="now">Por: R$ 279,00</div>
+                        <div class="installments">ou até 6× R$ 46,50</div>
+                      </div>
+                      <div class="buyform">
+                        <a class="buybtn" href="/collections/all">Comprar</a>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- ✅ MODAL VARIANTES -->
+  <div id="rtc-modal-{{ section.id }}" aria-hidden="true">
+    <div class="rtc-overlay" data-rtc-close></div>
+    <div class="rtc-panel" role="dialog" aria-modal="true" aria-label="Escolher variação">
+      <button class="rtc-close" type="button" data-rtc-close aria-label="Fechar">✕</button>
+
+      <div class="rtc-head">
+        <div class="rtc-media"><img data-rtc-img alt="" loading="lazy"></div>
+        <div>
+          <div class="rtc-title" data-rtc-title></div>
+          <a class="rtc-link" data-rtc-link href="#">Ver produto</a>
+        </div>
+      </div>
+
+      <div class="rtc-body" data-rtc-options></div>
+
+      <div class="rtc-foot">
+        <button class="rtc-confirm" type="button" data-rtc-confirm disabled>Adicionar ao carrinho</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const root = document.getElementById('royal-tabs-cards-{{ section.id }}');
+      if(!root) return;
+
+      /* Tabs */
+      const tabButtons = root.querySelectorAll('.tabbtn[data-tab]');
+      const panels = root.querySelectorAll('.panel[data-panel]');
+      function setActive(id){
+        tabButtons.forEach(btn => btn.setAttribute('aria-selected', btn.dataset.tab === id ? 'true' : 'false'));
+        panels.forEach(p => p.classList.toggle('is-active', p.dataset.panel === id));
+      }
+      tabButtons.forEach(btn => btn.addEventListener('click', () => setActive(btn.dataset.tab)));
+
+      /* Modal */
+      const modal = document.getElementById('rtc-modal-{{ section.id }}');
+      if(!modal) return;
+
+      const closeEls = modal.querySelectorAll('[data-rtc-close]');
+      const titleEl = modal.querySelector('[data-rtc-title]');
+      const imgEl = modal.querySelector('[data-rtc-img]');
+      const linkEl = modal.querySelector('[data-rtc-link]');
+      const optsEl = modal.querySelector('[data-rtc-options]');
+      const confirmBtn = modal.querySelector('[data-rtc-confirm]');
+
+      let currentCard = null;
+      let selected = [];
+
+      const safeJSON = (s) => { try { return JSON.parse(s); } catch(e){ return null; } };
+      const openModal = () => { modal.classList.add('is-open'); modal.setAttribute('aria-hidden','false'); };
+      const closeModal = () => {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden','true');
+        currentCard = null;
+        selected = [];
+        optsEl.innerHTML = '';
+        confirmBtn.disabled = true;
+        confirmBtn.dataset.variantId = '';
+      };
+      closeEls.forEach(el => el.addEventListener('click', closeModal));
+      document.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+      });
+
+      const findVariant = (variants, optionValues) => {
+        return variants.find(v => Array.isArray(v.options) && v.options.every((val, idx) => val === optionValues[idx]));
+      };
+
+      const renderOptions = (optionsWithValues) => {
+        optsEl.innerHTML = optionsWithValues.map((opt, idx) => {
+          const values = opt.values || [];
+          return `
+            <div class="rtc-opt">
+              <div class="rtc-opt__label">${opt.name}</div>
+              <div class="rtc-grid">
+                ${values.map(v => `
+                  <button class="rtc-pill" type="button"
+                    data-opt-index="${idx}"
+                    data-opt-value="${String(v).replace(/"/g,'&quot;')}"
+                    aria-pressed="false">${v}</button>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }).join('');
+      };
+
+      const updateConfirm = () => {
+        if(!currentCard) { confirmBtn.disabled = true; return; }
+        const variants = currentCard.__variants || [];
+        const optionsCount = currentCard.__optionsCount || 0;
+
+        if(selected.length !== optionsCount || selected.some(v => !v)){
+          confirmBtn.disabled = true;
+          confirmBtn.dataset.variantId = '';
+          return;
+        }
+
+        const variant = findVariant(variants, selected);
+        if(variant && variant.available){
+          confirmBtn.disabled = false;
+          confirmBtn.dataset.variantId = String(variant.id);
+        } else {
+          confirmBtn.disabled = true;
+          confirmBtn.dataset.variantId = '';
+        }
+      };
+
+      optsEl.addEventListener('click', (e) => {
+        const pill = e.target.closest('.rtc-pill');
+        if(!pill) return;
+
+        const idx = Number(pill.dataset.optIndex);
+        const val = pill.dataset.optValue;
+
+        selected[idx] = val;
+
+        optsEl.querySelectorAll(`.rtc-pill[data-opt-index="${idx}"]`).forEach(b => {
+          b.setAttribute('aria-pressed', b === pill ? 'true' : 'false');
+        });
+
+        updateConfirm();
+      });
+
+      confirmBtn.addEventListener('click', () => {
+        if(!currentCard) return;
+
+        const form = currentCard.querySelector('form');
+        const submitReal = currentCard.querySelector('[data-rtc-submit]');
+        const idInput = form ? form.querySelector('input[name="id"]') : null;
+
+        const vid = confirmBtn.dataset.variantId;
+        if(!form || !submitReal || !idInput || !vid) return;
+
+        idInput.value = vid;
+
+        closeModal();
+
+        // dispara o add AJAX do tema
+        submitReal.click();
+
+        // compat extra
+        try { document.dispatchEvent(new CustomEvent('cart:open', { bubbles: true })); } catch(e){}
+      });
+
+      // Clique Comprar nos cards
+      root.addEventListener('click', (e) => {
+        const buy = e.target.closest('[data-rtc-buy]');
+        if(!buy) return;
+
+        const card = buy.closest('[data-rtc-card]');
+        if(!card) return;
+
+        const hasVariants = (card.getAttribute('data-has-variants') === 'true');
+
+        const submitReal = card.querySelector('[data-rtc-submit]');
+        if(!submitReal) return;
+
+        // Sem variantes: add direto
+        if(!hasVariants){
+          submitReal.click();
+          try { document.dispatchEvent(new CustomEvent('cart:open', { bubbles: true })); } catch(err){}
+          return;
+        }
+
+        // Com variantes: abre modal
+        e.preventDefault();
+
+        const variants = safeJSON(card.getAttribute('data-variants') || '[]') || [];
+        const optionsWithValues = safeJSON(card.getAttribute('data-options') || '[]') || [];
+
+        currentCard = card;
+        currentCard.__variants = variants;
+        currentCard.__optionsCount = optionsWithValues.length;
+
+        selected = new Array(optionsWithValues.length).fill('');
+
+        titleEl.textContent = card.getAttribute('data-product-title') || 'Escolha a variação';
+        const img = card.getAttribute('data-product-image');
+        if(img){ imgEl.src = img; imgEl.style.display = ''; } else { imgEl.style.display = 'none'; }
+
+        const url = card.getAttribute('data-product-url') || '#';
+        linkEl.href = url;
+
+        renderOptions(optionsWithValues);
+        updateConfirm();
+        openModal();
+      }, true);
+
+    })();
+  </script>
+</section>
+
+{% schema %}
+{
+  "name": "Royal • Tabs Cards",
+  "settings": [
+    { "type": "checkbox", "id": "hide_tabs", "label": "Ocultar abas", "default": false },
+
+    { "type": "color", "id": "bg", "label": "Fundo da seção", "default": "#FAD6E6" },
+    { "type": "color", "id": "card_bg", "label": "Fundo do card", "default": "#FFEAF3" },
+
+    { "type": "range", "id": "card_radius", "label": "Arredondamento do card (px)", "min": 16, "max": 50, "step": 1, "default": 34 },
+    { "type": "range", "id": "card_height", "label": "Altura do card (px)", "min": 380, "max": 820, "step": 10, "default": 520 },
+
+    { "type": "range", "id": "gap", "label": "Espaçamento entre cards (px)", "min": 8, "max": 28, "step": 1, "default": 18 },
+
+    { "type": "color", "id": "pill_bg", "label": "Aba inativa: fundo", "default": "#E7E7E7" },
+    { "type": "color", "id": "pill_text", "label": "Aba inativa: texto", "default": "#2B2B2B" },
+    { "type": "color", "id": "pill_active_bg", "label": "Aba ativa: fundo", "default": "#F01980" },
+    { "type": "color", "id": "pill_active_text", "label": "Aba ativa: texto", "default": "#FFFFFF" },
+
+    { "type": "color", "id": "badge_bg", "label": "Badge % OFF: fundo", "default": "#B7F25A" },
+    { "type": "color", "id": "badge_text", "label": "Badge % OFF: texto", "default": "#16310D" },
+
+    { "type": "color", "id": "title_color", "label": "Título do produto", "default": "#1F2A44" },
+    { "type": "color", "id": "price_color", "label": "Preço atual", "default": "#1F2A44" },
+    { "type": "color", "id": "compare_color", "label": "Preço antigo (riscado)", "default": "#F01980" },
+    { "type": "color", "id": "muted_color", "label": "Texto secundário", "default": "#6B7280" },
+
+    { "type": "color", "id": "btn_bg", "label": "Botão Comprar: fundo", "default": "#B7F25A" },
+    { "type": "color", "id": "btn_text", "label": "Botão Comprar: texto/ícone", "default": "#16310D" },
+
+    { "type": "range", "id": "section_padding_y", "label": "Padding vertical da seção (px)", "min": 0, "max": 60, "step": 2, "default": 26 },
+
+    { "type": "range", "id": "products_count", "label": "Produtos por aba", "min": 2, "max": 20, "step": 1, "default": 8 },
+
+    { "type": "range", "id": "per_view_desktop", "label": "Cards por tela (desktop)", "min": 2, "max": 7, "step": 1, "default": 4 },
+
+    {
+      "type": "select",
+      "id": "per_view_mobile",
+      "label": "Cards por tela (mobile)",
+      "options": [
+        { "value": "1", "label": "1 por tela" },
+        { "value": "2", "label": "2 por tela" }
+      ],
+      "default": "2"
+    },
+
+    {
+      "type": "range",
+      "id": "peek_mobile",
+      "label": "Peek no mobile (0.0 a 0.5)",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "default": 0.2
+    },
+
+    { "type": "collection", "id": "collection_fallback", "label": "Coleção (fallback se não houver abas)" }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Aba",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Texto da aba", "default": "Oferta 🔥" },
+        { "type": "collection", "id": "collection", "label": "Coleção da aba" }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    { "name": "Royal • Tabs Cards", "category": "Collection" }
+  ]
+}
+{% endschema %}

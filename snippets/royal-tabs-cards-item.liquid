@@ -1,0 +1,95 @@
+{% comment %}
+Royal • Tabs Cards — Item (AJAX add + abre cart drawer + modal variantes)
+- Sem variantes: clique em Comprar adiciona via AJAX e abre drawer
+- Com variantes: abre modal para escolher opções e depois adiciona via AJAX e abre drawer
+Compatível com theme.js (data-action="add-to-cart") e com cart-drawer.js (product:added/cart:open)
+{% endcomment %}
+
+{%- assign v = product.selected_or_first_available_variant -%}
+{%- assign compare = v.compare_at_price -%}
+{%- assign price = v.price -%}
+
+{%- assign has_discount = false -%}
+{%- if compare and compare > price -%}
+  {%- assign has_discount = true -%}
+{%- endif -%}
+
+{%- assign pct = 0 -%}
+{%- if has_discount -%}
+  {%- assign pct = compare | minus: price | times: 100 | divided_by: compare -%}
+{%- endif -%}
+
+{%- assign has_real_variants = false -%}
+{%- if product.has_only_default_variant == false and product.variants.size > 1 -%}
+  {%- assign has_real_variants = true -%}
+{%- endif -%}
+
+<div class="slide">
+  <div class="card"
+       data-rtc-card
+       data-product-title="{{ product.title | escape }}"
+       data-product-url="{{ product.url }}"
+       data-product-image="{% if product.featured_image %}{{ product.featured_image | image_url: width: 360 }}{% endif %}"
+       data-has-variants="{% if has_real_variants %}true{% else %}false{% endif %}"
+       data-variants='{{ product.variants | json | escape }}'
+       data-options='{{ product.options_with_values | json | escape }}'>
+
+    <div class="toprow">
+      {%- if has_discount -%}
+        <span class="badge">-{{ pct | round }}%</span>
+      {%- endif -%}
+
+      <button class="heart" type="button" aria-label="Favoritar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.3-8.8C.8 8.3 3.1 5.7 6 5.7c1.7 0 3 .8 4 2 1-1.2 2.3-2 4-2 2.9 0 5.2 2.6 3.3 6.5C19 16.4 12 21 12 21z"/></svg>
+      </button>
+
+      <a class="imgwrap" href="{{ product.url }}">
+        {%- if product.featured_image -%}
+          {{ product.featured_image | image_url: width: 520 | image_tag: loading: 'lazy' }}
+        {%- endif -%}
+      </a>
+    </div>
+
+    <a class="title" href="{{ product.url }}">{{ product.title }}</a>
+
+    <div class="prices">
+      <div class="compare">
+        {%- if has_discount -%}
+          De: {{ compare | money }}
+        {%- else -%}
+          &nbsp;
+        {%- endif -%}
+      </div>
+
+      <div class="now">Por: {{ price | money }}</div>
+
+      <div class="installments">&nbsp;</div>
+    </div>
+
+    <div class="buyform">
+      {%- form 'product', product, class: 'buyform__form', novalidate: 'novalidate' -%}
+        <input type="hidden" name="id" value="{{ v.id }}">
+        <input type="hidden" name="quantity" value="1">
+
+        {%- if v.available -%}
+          <!-- Botão visível -->
+          <button class="buybtn" type="button" data-rtc-buy>
+            Comprar
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6h15l-1.5 9h-12L6 6z"/>
+              <path d="M6 6 5 3H2"/>
+              <circle cx="9" cy="20" r="1.6"/>
+              <circle cx="18" cy="20" r="1.6"/>
+            </svg>
+          </button>
+
+          <!-- Submit real (invisível) - quem adiciona é o theme.js via AJAX -->
+          <button type="submit" data-action="add-to-cart" data-rtc-submit style="display:none"></button>
+        {%- else -%}
+          <button class="buybtn" type="button" disabled style="opacity:.6; cursor:not-allowed;">Indisponível</button>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+
+  </div>
+</div>
