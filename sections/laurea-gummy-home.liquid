@@ -1,0 +1,120 @@
+{% comment %}
+  Laurea Gummy Home
+  Hard-coded storefront layout so GitHub-synced themes render the intended
+  Gummy-inspired homepage even when Shopify editor settings are reset.
+{% endcomment %}
+
+{% liquid
+  assign hero_collection = collections['linha-capilar']
+  if hero_collection == blank
+    assign hero_collection = collections['all']
+  endif
+
+  assign featured_collection = collections['oferta-relampago']
+  if featured_collection == blank or featured_collection.products_count == 0
+    assign featured_collection = collections['all']
+  endif
+
+  assign collection_handles = 'linha-capilar,cuidados-pessoais,linha-corporal,perfumaria' | split: ','
+%}
+
+<section class="la-gummy-home" data-section-id="{{ section.id }}" data-section-type="laurea-gummy-home">
+  <div class="la-gummy-hero">
+    <div class="la-gummy-hero__content">
+      <p class="la-gummy-hero__eyebrow">Laurea Cosmeticos</p>
+      <h1>Beleza profissional para cabelo, pele e corpo</h1>
+      <p>Produtos selecionados para rotina capilar, cuidados pessoais, perfumaria e tratamentos de resultado.</p>
+      <a class="la-gummy-hero__button" href="{{ hero_collection.url | default: routes.all_products_collection_url }}">Ver produtos</a>
+    </div>
+
+    <div class="la-gummy-hero__visual">
+      {% assign hero_product = hero_collection.products.first | default: collections.all.products.first %}
+      {% if hero_product and hero_product.featured_media %}
+        <img
+          src="{{ hero_product.featured_media | img_url: '700x' }}"
+          alt="{{ hero_product.title | escape }}"
+          loading="eager"
+          width="520"
+          height="520">
+      {% else %}
+        <div class="la-gummy-hero__fallback">Laurea</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="la-gummy-tabs">
+    <a href="{{ collections['oferta-relampago'].url | default: routes.all_products_collection_url }}">Ofertas</a>
+    <a href="{{ collections['linha-capilar'].url | default: routes.all_products_collection_url }}">Linha Capilar</a>
+    <a href="{{ collections['cuidados-pessoais'].url | default: routes.all_products_collection_url }}">Cuidados Pessoais</a>
+    <a href="{{ collections['perfumaria'].url | default: routes.all_products_collection_url }}">Perfumaria</a>
+  </div>
+
+  <section class="la-gummy-products">
+    <h2>Mais vendidos</h2>
+    <div class="la-gummy-grid">
+      {% for product in featured_collection.products limit: 8 %}
+        <article class="la-gummy-card">
+          {% if product.compare_at_price > product.price %}
+            {% assign savings = product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round %}
+            <span class="la-gummy-card__badge">-{{ savings }}%</span>
+          {% endif %}
+
+          <a class="la-gummy-card__image" href="{{ product.url }}">
+            {% if product.featured_media %}
+              <img src="{{ product.featured_media | img_url: '420x' }}" alt="{{ product.title | escape }}" loading="lazy">
+            {% endif %}
+          </a>
+
+          <div class="la-gummy-card__body">
+            <a class="la-gummy-card__title" href="{{ product.url }}">{{ product.title }}</a>
+            <div class="la-gummy-card__prices">
+              {% if product.compare_at_price > product.price %}
+                <span class="la-gummy-card__compare">{{ product.compare_at_price | money }}</span>
+              {% endif %}
+              <span class="la-gummy-card__price">{{ product.price | money }}</span>
+              <span class="la-gummy-card__installments">ou ate 6x sem juros</span>
+            </div>
+
+            {% form 'product', product, class: 'la-gummy-card__form' %}
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" {% unless product.available %}disabled{% endunless %}>
+                {% if product.available %}Adicionar{% else %}Esgotado{% endif %}
+              </button>
+            {% endform %}
+          </div>
+        </article>
+      {% else %}
+        <div class="la-gummy-empty">
+          <p>Adicione produtos na colecao principal para preencher esta vitrine.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="la-gummy-cats">
+    <h2>Conheca nossas categorias</h2>
+    <div class="la-gummy-catgrid">
+      {% for handle in collection_handles %}
+        {% assign cat = collections[handle] %}
+        <a class="la-gummy-cat" href="{{ cat.url | default: routes.all_products_collection_url }}">
+          <span>{{ cat.title | default: handle | replace: '-', ' ' }}</span>
+          {% assign cat_product = cat.products.first %}
+          {% if cat.image %}
+            <img src="{{ cat.image | img_url: '260x' }}" alt="{{ cat.title | escape }}" loading="lazy">
+          {% elsif cat_product and cat_product.featured_media %}
+            <img src="{{ cat_product.featured_media | img_url: '260x' }}" alt="{{ cat_product.title | escape }}" loading="lazy">
+          {% endif %}
+          <em>Ver Mais</em>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+</section>
+
+{% schema %}
+{
+  "name": "Laurea Gummy Home",
+  "settings": []
+}
+{% endschema %}

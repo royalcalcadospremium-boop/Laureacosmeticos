@@ -8,7 +8,7 @@
   <section data-section-id="{{ section.id }}" data-section-type="announcement-bar" data-section-settings='{{ section_settings }}'>
     {% render 'royal-overlap', id: section.id %}
 
-    {%- if section.settings.show_newsletter -%}
+    {%- if false and section.settings.show_newsletter -%}
       <div id="announcement-bar-newsletter" class="announcement-bar__newsletter hidden-phone" aria-hidden="true">
         <div class="container">
           <div class="announcement-bar__close-container">
@@ -64,8 +64,13 @@
     <div class="announcement-bar">
       <div class="container">
         <div class="announcement-bar__inner">
+          {%- assign announcement_text = section.settings.text -%}
+          {%- if announcement_text == blank or announcement_text contains 'Announce something here' -%}
+            {%- assign announcement_text = 'FRETE GRATIS EM COMPRAS ACIMA DE R$199' -%}
+          {%- endif -%}
+
           {%- if section.settings.link != blank -%}
-            <a href="{{ section.settings.link }}" class="announcement-bar__content announcement-bar__content--{{ section.settings.text_position }}">{{ section.settings.text | escape }}</a>
+            <a href="{{ section.settings.link }}" class="announcement-bar__content announcement-bar__content--{{ section.settings.text_position }}">{{ announcement_text }}</a>
           {%- else -%}
             {%- if section.settings.mostraricone -%}
               <div>
@@ -74,10 +79,10 @@
                 </svg>
               </div>
             {%- endif -%}
-            {{ section.settings.text }}
+            {{ announcement_text }}
           {%- endif -%}
 
-          {%- if section.settings.show_newsletter -%}
+          {%- if false and section.settings.show_newsletter -%}
             <button type="button" class="announcement-bar__button hidden-phone" data-action="toggle-newsletter" aria-expanded="false" aria-controls="announcement-bar-newsletter">
               {%- render 'icon', icon: 'newsletter' -%}
               {{- section.settings.newsletter_button | escape -}}
@@ -95,7 +100,7 @@
     {%- endcapture -%}
 
     .announcement-bar {
-      background-image: linear-gradient({{ _css_direction | strip }}, {{ section.settings.background1 }}, {{ section.settings.background2 }});
+      background-image: linear-gradient({{ _css_direction | strip }}, #e91880, #e91880);
       color: {{ section.settings.text_color }};
     }
   </style>
@@ -144,8 +149,8 @@
     { "type": "range", "id": "announcement_size_desktop", "min": 20, "max": 150, "step": 5, "unit": "%", "label": "Tamanho da barra (Desktop)", "default": 100 },
     { "type": "range", "id": "announcement_size_mobile", "min": 20, "max": 150, "step": 5, "unit": "%", "label": "Tamanho da barra (Mobile)", "default": 100 },
 
-    { "type": "color", "id": "background1", "label": "Cor 1", "default": "#1e2d7d" },
-    { "type": "color", "id": "background2", "label": "Cor 2", "default": "#1e2d7d" },
+    { "type": "color", "id": "background1", "label": "Cor 1", "default": "#e91880" },
+    { "type": "color", "id": "background2", "label": "Cor 2", "default": "#e91880" },
     {
       "type": "select",
       "id": "gradient_direction",
@@ -158,12 +163,12 @@
     },
     { "type": "color", "id": "text_color", "label": "Texto", "default": "#ffffff" },
     { "type": "checkbox", "id": "mostraricone", "label": "Mostrar ícone", "default": true },
-    { "type": "html", "id": "text", "label": "Texto", "default": "Announce something here" },
+    { "type": "html", "id": "text", "label": "Texto", "default": "FRETE GRATIS EM COMPRAS ACIMA DE R$199" },
 
     { "type": "header", "content": "Newsletter" },
     { "type": "paragraph", "content": "Clientes que se inscreverem terão o e-mail adicionado à lista 'aceita marketing'." },
     { "type": "paragraph", "content": "Visível apenas no desktop." },
-    { "type": "checkbox", "id": "show_newsletter", "label": "Mostrar formulário", "default": true },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Mostrar formulário", "default": false },
     { "type": "text", "id": "newsletter_button", "label": "Botão abrir", "default": "Subscribe & Save" },
     { "type": "text", "id": "newsletter_title", "label": "Título", "default": "Newsletter" },
     { "type": "richtext", "id": "newsletter_content", "label": "Texto", "default": "<p>Descreva o benefício de se inscrever</p>" }
