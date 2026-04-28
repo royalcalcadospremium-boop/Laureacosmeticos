@@ -68,6 +68,7 @@
     {{ content_for_header }}
     {%include "setbg"%}
     <link rel="stylesheet" href="{{ 'theme.css' | asset_url }}">
+    <link rel="stylesheet" href="{{ 'laurea-gummy-polish.css' | asset_url }}">
 
     {% render 'microdata-schema' %}
     {% render 'fk-lck' %}
@@ -340,8 +341,6 @@
 </script>
 
 {% render 'ou-12x' %}
-
-{% section 'cart-drawer' %}
 
 <script>
 (function(){

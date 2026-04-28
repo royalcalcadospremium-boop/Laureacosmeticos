@@ -1,0 +1,490 @@
+/* Laurea Cosmeticos - Gummy visual polish */
+:root {
+  --la-gummy-pink: #e91880;
+  --la-gummy-pink-2: #ff4fa3;
+  --la-gummy-pink-soft: #fad6e6;
+  --la-gummy-green: #b7f25a;
+  --la-gummy-green-text: #18320d;
+  --la-gummy-ink: #242424;
+  --la-gummy-muted: #777777;
+  --la-gummy-line: rgba(36, 36, 36, .1);
+  --la-gummy-card: #ffffff;
+  --la-gummy-shadow: 0 14px 32px rgba(31, 31, 31, .08);
+  --la-gummy-radius: 26px;
+}
+
+html,
+body {
+  background: var(--la-gummy-pink-soft) !important;
+  color: var(--la-gummy-ink);
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: Montserrat, Poppins, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+.container {
+  max-width: 1480px;
+}
+
+.announcement-bar {
+  background: var(--la-gummy-pink) !important;
+  min-height: 34px;
+  border: 0;
+}
+
+.announcement-bar__content {
+  color: #fff !important;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+#shopify-section-header {
+  z-index: 1000;
+}
+
+#shopify-section-header .header--gummy {
+  box-shadow: 0 3px 14px rgba(0, 0, 0, .06) !important;
+  padding: 7px 0 !important;
+}
+
+#shopify-section-header .header__inner--gummy {
+  min-height: 62px !important;
+}
+
+#shopify-section-header .gummy-nav__list {
+  gap: 24px !important;
+}
+
+#shopify-section-header .gummy-nav__link {
+  color: #171717 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+}
+
+#shopify-section-header .gummy-nav__link:hover,
+#shopify-section-header .header__icon-btn:hover {
+  color: var(--la-gummy-pink) !important;
+}
+
+#shopify-section-header .header__cart-count {
+  background: var(--la-gummy-pink) !important;
+}
+
+#shopify-section-header .color-line {
+  height: 0 !important;
+  display: none !important;
+}
+
+.button,
+.shopify-payment-button__button,
+.product-form__add-button,
+.product-item__action-button,
+.rc-buy,
+.rcm-add {
+  border-radius: 999px !important;
+  letter-spacing: 0 !important;
+}
+
+.button--primary,
+.button--primary-add,
+.product-form__add-button,
+.product-item__action-button.button--primary {
+  background: var(--la-gummy-green) !important;
+  border-color: var(--la-gummy-green) !important;
+  color: var(--la-gummy-green-text) !important;
+  box-shadow: 0 12px 24px rgba(120, 185, 33, .22);
+}
+
+.button--primary:hover,
+.button--primary-add:hover,
+.product-form__add-button:hover,
+.product-item__action-button.button--primary:hover {
+  filter: brightness(.97);
+  transform: translateY(-1px);
+}
+
+/* Home */
+#shopify-section-slideshow {
+  background: #fff;
+}
+
+#shopify-section-slideshow .slideshow {
+  border-radius: 0 !important;
+}
+
+#shopify-section-slideshow .slideshow__slide-inner,
+#shopify-section-slideshow .slideshow__image {
+  background-size: cover !important;
+  object-fit: cover !important;
+}
+
+.royal-tabs-cards,
+.royal-cats-print,
+.laurea-whatsapp-banner {
+  background: var(--la-gummy-pink-soft) !important;
+}
+
+.royal-tabs-cards .tabsbar {
+  justify-content: center !important;
+  padding-top: 4px !important;
+}
+
+.royal-tabs-cards .tabbtn {
+  background: #eeeeee !important;
+  color: #2f2f2f !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  padding: 10px 18px !important;
+}
+
+.royal-tabs-cards .tabbtn[aria-selected=true] {
+  background: var(--la-gummy-pink) !important;
+  color: #fff !important;
+}
+
+.royal-tabs-cards .card {
+  background: #fff !important;
+  border: 1px solid rgba(233, 24, 128, .1);
+  border-radius: var(--la-gummy-radius) !important;
+  box-shadow: var(--la-gummy-shadow) !important;
+}
+
+.royal-tabs-cards .badge,
+#royal-collection-gummy-collection-template .rc-badge,
+[id^="royal-collection-gummy-"] .rc-badge::before {
+  background: var(--la-gummy-green) !important;
+  color: var(--la-gummy-green-text) !important;
+}
+
+.royal-tabs-cards .buy,
+.royal-tabs-cards .add,
+.royal-tabs-cards button[type=submit],
+.royal-tabs-cards .button {
+  background: var(--la-gummy-green) !important;
+  color: var(--la-gummy-green-text) !important;
+}
+
+.royal-cats-print .heading {
+  font-weight: 900 !important;
+  color: #2b2b2b !important;
+}
+
+.royal-cats-print .card {
+  background: #fff !important;
+  border-radius: var(--la-gummy-radius) !important;
+  box-shadow: var(--la-gummy-shadow) !important;
+  min-height: 236px !important;
+}
+
+.royal-cats-print .card__btn {
+  background: var(--la-gummy-pink) !important;
+  color: #fff !important;
+}
+
+/* Collection */
+[id^="royal-collection-gummy-"] {
+  background: var(--la-gummy-pink-soft) !important;
+  padding-top: 24px !important;
+}
+
+[id^="royal-collection-gummy-"] .rc-title {
+  text-align: center;
+  color: #2b2b2b !important;
+  font-size: clamp(26px, 3vw, 42px) !important;
+  font-weight: 900 !important;
+  margin-bottom: 22px !important;
+}
+
+[id^="royal-collection-gummy-"] .rc-toolbar {
+  background: #fff;
+  border: 1px solid rgba(233, 24, 128, .1);
+  border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(31, 31, 31, .05);
+  margin-bottom: 18px !important;
+}
+
+[id^="royal-collection-gummy-"] .rc-card {
+  background: #fff !important;
+  border: 1px solid rgba(233, 24, 128, .1) !important;
+  border-radius: var(--la-gummy-radius) !important;
+  box-shadow: var(--la-gummy-shadow) !important;
+  overflow: hidden;
+}
+
+[id^="royal-collection-gummy-"] .rc-media {
+  background: #fff !important;
+}
+
+[id^="royal-collection-gummy-"] .rc-name {
+  color: #333 !important;
+  font-weight: 800 !important;
+  text-align: center;
+  font-size: 16px !important;
+}
+
+[id^="royal-collection-gummy-"] .rc-prices,
+[id^="royal-collection-gummy-"] .rc-installments {
+  text-align: center;
+}
+
+[id^="royal-collection-gummy-"] .rc-price {
+  justify-content: center;
+}
+
+[id^="royal-collection-gummy-"] .rc-price-value {
+  color: #333 !important;
+  font-weight: 950 !important;
+}
+
+[id^="royal-collection-gummy-"] .rc-compare {
+  color: var(--la-gummy-pink) !important;
+}
+
+[id^="royal-collection-gummy-"] .rc-buy,
+[id^="royal-collection-gummy-"] .rcm-add {
+  background: var(--la-gummy-green) !important;
+  color: var(--la-gummy-green-text) !important;
+  font-weight: 950 !important;
+  height: 54px !important;
+}
+
+/* Product page */
+.template-product {
+  background: #fff !important;
+}
+
+.template-product .page__sub-header {
+  margin: 18px 0 10px !important;
+}
+
+.template-product .breadcrumb {
+  color: var(--la-gummy-muted);
+  font-size: 12px;
+}
+
+.template-product .product-block-list {
+  padding-top: 12px;
+}
+
+.template-product .product-block-list__wrapper {
+  align-items: flex-start;
+}
+
+.template-product .product-block-list__item--gallery .card,
+.template-product .product-block-list__item--info > .card,
+.template-product .product-block-list__item--description .card,
+.template-product .product-block-list__item--content .card,
+.template-product .product-block-list__item--trust .card {
+  border: 1px solid rgba(0, 0, 0, .06) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, .06) !important;
+  overflow: hidden;
+}
+
+.template-product .product-block-list__item--gallery .card {
+  background: #fff !important;
+}
+
+.template-product .product-meta__title {
+  color: #202020 !important;
+  font-size: clamp(24px, 2.2vw, 34px) !important;
+  font-weight: 950 !important;
+  line-height: 1.1 !important;
+}
+
+.template-product .quantitysell,
+.template-product .product-meta__reference,
+.template-product .areviews_header_stars,
+.template-product .loox-rating,
+.template-product #badges-product,
+.template-product .product-form__info-item--quantity.qty-margin-top + br {
+  display: none !important;
+}
+
+.template-product .product-form__info-list,
+.template-product .product-form__variants {
+  border: 0 !important;
+}
+
+.template-product .product-form__option-name {
+  color: #333 !important;
+  font-weight: 900 !important;
+  font-size: 13px !important;
+  text-transform: uppercase;
+}
+
+.template-product .block-swatch__item,
+.template-product .variant-swatch__item,
+.template-product .color-swatch__item {
+  border-radius: 14px !important;
+  border: 1px solid var(--la-gummy-line) !important;
+}
+
+.template-product .product-form__payment-container {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+  margin-top: 18px !important;
+}
+
+.template-product .product-form__add-button {
+  min-height: 60px !important;
+  margin: 0 !important;
+  text-transform: none !important;
+  font-size: 18px !important;
+}
+
+.template-product .button--primary-add {
+  background: #fff !important;
+  color: var(--la-gummy-pink) !important;
+  border: 2px solid var(--la-gummy-pink) !important;
+  box-shadow: none !important;
+}
+
+.template-product .qty-align {
+  justify-content: center !important;
+}
+
+.template-product #myform2 {
+  border: 1px solid var(--la-gummy-line);
+  border-radius: 999px;
+  display: inline-flex;
+  overflow: hidden;
+  background: #fff;
+}
+
+.template-product #myform2 input {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.template-product .price,
+.template-product .price--highlight {
+  color: #222 !important;
+  font-weight: 950 !important;
+}
+
+.template-product .price--compare {
+  color: var(--la-gummy-pink) !important;
+}
+
+/* Mini cart popover from the theme */
+.mini-cart {
+  border: 0 !important;
+  border-radius: 24px !important;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, .18) !important;
+  overflow: hidden;
+}
+
+.mini-cart__line-item {
+  border-radius: 16px;
+  border: 1px solid var(--la-gummy-line);
+  padding: 10px !important;
+}
+
+.mini-cart__image-wrapper {
+  border-radius: 14px !important;
+  background: #f7f7f7;
+  overflow: hidden;
+}
+
+.mini-cart__product-title {
+  color: var(--la-gummy-ink) !important;
+  font-weight: 850 !important;
+}
+
+.mini-cart__recap {
+  background: #fff !important;
+  border-top: 1px solid var(--la-gummy-line) !important;
+}
+
+.mini-cart__button-container .button {
+  background: var(--la-gummy-pink) !important;
+  border-color: var(--la-gummy-pink) !important;
+  color: #fff !important;
+}
+
+/* Ajax drawer */
+#RoyalCartDrawer .rcd__panel {
+  width: min(430px, 94vw) !important;
+  border-left: 0 !important;
+  box-shadow: -22px 0 70px rgba(0, 0, 0, .2) !important;
+}
+
+#RoyalCartDrawer .rcd__header {
+  border-bottom: 1px solid var(--la-gummy-line) !important;
+}
+
+#RoyalCartDrawer .rcd__title {
+  font-weight: 950 !important;
+}
+
+#RoyalCartDrawer .rcd__bar {
+  height: 10px !important;
+}
+
+#RoyalCartDrawer .rcd__bar-fill {
+  background: var(--la-gummy-pink) !important;
+}
+
+#RoyalCartDrawer .rcd__bar-heart {
+  display: none !important;
+}
+
+#RoyalCartDrawer .rcd__item {
+  border-bottom: 1px solid var(--la-gummy-line) !important;
+}
+
+#RoyalCartDrawer .rcd__thumb {
+  background: #f8f8f8 !important;
+}
+
+#RoyalCartDrawer .rcd__btn--primary {
+  background: var(--la-gummy-pink) !important;
+  color: #fff !important;
+}
+
+#RoyalCartDrawer .rcd__btn--ghost {
+  border-color: var(--la-gummy-line) !important;
+}
+
+@media (max-width: 989px) {
+  #shopify-section-header .header__action-list--gummy {
+    gap: 6px !important;
+  }
+
+  #shopify-section-header .header__logo-image--gummy {
+    max-width: 110px !important;
+  }
+
+  .royal-tabs-cards .card {
+    border-radius: 22px !important;
+  }
+
+  .royal-cats-print .card {
+    border-radius: 999px !important;
+    min-height: 0 !important;
+  }
+
+  [id^="royal-collection-gummy-"] .rc-toolbar {
+    border-radius: 22px;
+  }
+
+  .template-product .product-block-list__item--gallery .card,
+  .template-product .product-block-list__item--info > .card,
+  .template-product .product-block-list__item--description .card,
+  .template-product .product-block-list__item--content .card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+  }
+}
