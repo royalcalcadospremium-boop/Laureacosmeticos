@@ -1,0 +1,344 @@
+/* ============================================================
+   Laurea — Hero Scroll (Body Splash)
+   Sticky scroll-scrubbed cinematic hero
+   ============================================================ */
+
+.lhs {
+  --lhs-bg-deep:   #f4c5d4;
+  --lhs-bg-mid:    #ffd5e0;
+  --lhs-bg-soft:   #fff0f5;
+  --lhs-accent:    #e1538f;
+  --lhs-ink:       #1c1c1e;
+  --lhs-ink-soft:  rgba(28, 28, 30, 0.55);
+  --lhs-stage-vh:  300; /* total scroll distance in vh */
+
+  position: relative;
+  display: block;
+  width: 100%;
+  background:
+    radial-gradient(120% 80% at 50% 0%,  var(--lhs-bg-soft) 0%, var(--lhs-bg-mid) 38%, var(--lhs-bg-deep) 100%);
+  isolation: isolate;
+  overflow: clip;
+}
+
+/* Track gives the scroll distance ------------------------------------------ */
+.lhs__track {
+  position: relative;
+  height: calc(var(--lhs-stage-vh) * 1vh);
+}
+
+/* Sticky stage that holds the canvas + chrome ------------------------------ */
+.lhs__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  display: grid;
+  place-items: stretch;
+}
+
+/* Atmospheric back-glow that lives behind the canvas ----------------------- */
+.lhs__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(60% 50% at 50% 50%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(80% 60% at 50% 110%, rgba(225, 83, 143, 0.18) 0%, rgba(225, 83, 143, 0) 60%);
+  mix-blend-mode: screen;
+}
+
+/* Soft sparkle layer ------------------------------------------------------- */
+.lhs__sparkle {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(2px 2px at 14% 22%, rgba(255, 255, 255, 0.85) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 78% 18%, rgba(255, 255, 255, 0.7) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 28% 78%, rgba(255, 255, 255, 0.6) 0, transparent 60%),
+    radial-gradient(2px 2px at 88% 64%, rgba(255, 255, 255, 0.75) 0, transparent 60%),
+    radial-gradient(1px 1px at 52% 44%, rgba(255, 255, 255, 0.5) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 8% 58%, rgba(255, 255, 255, 0.55) 0, transparent 60%);
+  background-repeat: no-repeat;
+}
+
+/* Canvas — the scrubbing sequence ----------------------------------------- */
+.lhs__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: block;
+}
+
+/* Eager LCP image (hidden once canvas takes over) -------------------------- */
+.lhs__lcp {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  z-index: 1;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.lhs[data-ready="true"] .lhs__lcp { opacity: 0; }
+
+/* Chrome layer ------------------------------------------------------------ */
+.lhs__chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: clamp(16px, 3vw, 32px) clamp(16px, 4vw, 48px);
+}
+
+/* Top brand strip --------------------------------------------------------- */
+.lhs__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.lhs__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  color: var(--lhs-ink);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  pointer-events: auto;
+  box-shadow: 0 6px 20px rgba(225, 83, 143, 0.12);
+}
+
+.lhs__badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lhs-accent);
+  box-shadow: 0 0 12px var(--lhs-accent);
+  animation: lhs-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes lhs-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.7); }
+}
+
+.lhs__eyebrow {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--lhs-ink);
+  opacity: 0.55;
+  transition: opacity 0.5s ease;
+  pointer-events: auto;
+}
+
+/* Bottom area ------------------------------------------------------------- */
+.lhs__bottom {
+  grid-row: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* CTA button — invisible at start, fades in at the end -------------------- */
+.lhs__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 36px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff6aa3 0%, #e1538f 50%, #c93b78 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow:
+    0 10px 30px rgba(225, 83, 143, 0.45),
+    0 4px 12px rgba(225, 83, 143, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.3s ease, filter 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.lhs__cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.45) 50%, transparent 70%);
+  transform: translateX(-110%);
+  transition: transform 0.7s ease;
+}
+
+.lhs__cta:hover {
+  filter: brightness(1.05);
+  box-shadow:
+    0 14px 36px rgba(225, 83, 143, 0.55),
+    0 6px 18px rgba(225, 83, 143, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.lhs__cta:hover::after { transform: translateX(110%); }
+
+.lhs__cta:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+.lhs__cta-arrow {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Scroll cue ------------------------------------------------------------- */
+.lhs__cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--lhs-ink);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  transition: opacity 0.4s ease;
+}
+
+.lhs__cue-line {
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(to bottom, transparent, var(--lhs-ink));
+  overflow: hidden;
+  position: relative;
+}
+
+.lhs__cue-line::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(to bottom, transparent, #fff);
+  animation: lhs-cue-flow 1.6s ease-in-out infinite;
+}
+
+@keyframes lhs-cue-flow {
+  0%   { top: -50%; opacity: 0; }
+  40%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Progress line ---------------------------------------------------------- */
+.lhs__progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(28, 28, 30, 0.08);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.lhs__progress > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff8eb6 0%, #e1538f 50%, #c93b78 100%);
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+}
+
+/* Frame counter (subtle, top-right) --------------------------------------- */
+.lhs__counter {
+  font-feature-settings: "tnum" 1;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--lhs-ink);
+  opacity: 0.4;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 6px 12px;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+}
+
+/* No-JS fallback ---------------------------------------------------------- */
+.lhs[data-fallback="true"] .lhs__canvas { display: none; }
+.lhs[data-fallback="true"] .lhs__lcp { opacity: 1 !important; }
+.lhs[data-fallback="true"] .lhs__cta { opacity: 1; transform: none; }
+
+/* Reduced motion ---------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .lhs__cta::after { display: none; }
+  .lhs__badge::before { animation: none; }
+  .lhs__cue-line::after { animation: none; }
+}
+
+/* Mobile-first refinements ------------------------------------------------ */
+@media (max-width: 749px) {
+  .lhs { --lhs-stage-vh: 260; }
+  .lhs__chrome { padding: 18px 16px; }
+  .lhs__cta {
+    padding: 16px 28px;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+  }
+  .lhs__cta-arrow { width: 16px; height: 16px; }
+  .lhs__cue { font-size: 10px; letter-spacing: 0.22em; }
+  .lhs__cue-line { height: 24px; }
+  .lhs__badge { font-size: 10px; padding: 6px 12px; letter-spacing: 0.14em; }
+  .lhs__counter { display: none; }
+}
+
+@media (min-width: 750px) and (max-width: 989px) {
+  .lhs { --lhs-stage-vh: 280; }
+}
+
+@media (min-width: 1200px) {
+  .lhs__chrome { padding: 40px 60px; }
+  .lhs__cta {
+    padding: 20px 44px;
+    font-size: 16px;
+  }
+}

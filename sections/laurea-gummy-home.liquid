@@ -19,29 +19,6 @@
 %}
 
 <section class="la-gummy-home" data-section-id="{{ section.id }}" data-section-type="laurea-gummy-home">
-  <div class="la-gummy-hero">
-    <div class="la-gummy-hero__content">
-      <p class="la-gummy-hero__eyebrow">Laurea Cosmeticos</p>
-      <h1>Beleza profissional para cabelo, pele e corpo</h1>
-      <p>Produtos selecionados para rotina capilar, cuidados pessoais, perfumaria e tratamentos de resultado.</p>
-      <a class="la-gummy-hero__button" href="{{ hero_collection.url | default: routes.all_products_collection_url }}">Ver produtos</a>
-    </div>
-
-    <div class="la-gummy-hero__visual">
-      {% assign hero_product = hero_collection.products.first | default: collections.all.products.first %}
-      {% if hero_product and hero_product.featured_media %}
-        <img
-          src="{{ hero_product.featured_media | img_url: '700x' }}"
-          alt="{{ hero_product.title | escape }}"
-          loading="eager"
-          width="520"
-          height="520">
-      {% else %}
-        <div class="la-gummy-hero__fallback">Laurea</div>
-      {% endif %}
-    </div>
-  </div>
-
   <div class="la-gummy-tabs">
     <a href="{{ collections['oferta-relampago'].url | default: routes.all_products_collection_url }}">Ofertas</a>
     <a href="{{ collections['linha-capilar'].url | default: routes.all_products_collection_url }}">Linha Capilar</a>
