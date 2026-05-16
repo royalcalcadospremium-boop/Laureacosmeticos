@@ -1,9 +1,10 @@
 {% comment %}
-Coleções em Destaque (gradiente, título/botão, espaçamentos)
-Cards de COLEÇÃO com imagem ajustável (altura por device), ajuste (cover/contain),
-cantos arredondados e 1–2 linhas (desktop/mobile).
-- Mobile: até 6 cards por tela
-- Desktop: até 12 cards por tela
+Coleções / Comunidades em Destaque (gradiente, título/botão, espaçamentos)
+Cards com imagem ajustável (altura por device), ajuste (cover/contain),
+cantos arredondados.
+- Mobile: pode forçar 1 linha (não quebra pra baixo)
+- Link por card (para grupos WhatsApp etc.)
+- ✅ Imagem Desktop + Imagem Mobile por card
 {% endcomment %}
 
 <section id="royal-duo-{{ section.id }}" class="royal-duo">
@@ -17,7 +18,7 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
       --per-d: {{ section.settings.per_view_desktop | default: 3 }};
       --per-m: {{ section.settings.per_view_mobile | default: 1 }};
       --rows-d: {{ section.settings.rows_desktop | default: '1' }};
-      --rows-m: {{ section.settings.rows_mobile  | default: '1' }};
+      --rows-m: {% if section.settings.force_single_row_mobile %}1{% else %}{{ section.settings.rows_mobile | default: '1' }}{% endif %};
 
       /* Sobreposição ao bloco anterior */
       --overlap-d: {{ section.settings.overlap_px | default: 0 }}px;
@@ -70,7 +71,6 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
         padding-right: var(--desktop-container-gutter, 36px);
       }
     }
-    /* ====================================================== */
 
     /* Header (título/botão) com espaçamentos controláveis */
     #royal-duo-{{ section.id }} .duo-header{
@@ -90,7 +90,7 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
     #royal-duo-{{ section.id }} .viewport{ position:relative; overflow:hidden; }
     #royal-duo-{{ section.id }} .track{
       display: grid;
-      grid-auto-flow: column; /* preenche por coluna, descendo as linhas */
+      grid-auto-flow: column; /* preenche por coluna quando há 2 linhas */
       grid-auto-columns: calc((100% - (var(--gap) * (var(--per-d) - 1))) / var(--per-d));
       grid-template-rows: repeat(var(--rows-d), auto);
       gap: var(--gap);
@@ -99,6 +99,8 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none; -ms-overflow-style: none;
       padding-bottom: 8px;
+      touch-action: pan-x pan-y;
+      overscroll-behavior-x: contain;
     }
     #royal-duo-{{ section.id }} .track::-webkit-scrollbar{ display: none; }
 
@@ -114,7 +116,7 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
       width: 100%;
     }
 
-    /* Card de COLEÇÃO (sem texto) */
+    /* Card (sem texto) */
     #royal-duo-{{ section.id }} .collection-card{
       display:block;
       border-radius: var(--card-radius);
@@ -126,18 +128,28 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
       width: 100%;
       height: var(--card-h-d);
       background: var(--img-bg);
+      position: relative;
     }
     @media (max-width: 989px){
       #royal-duo-{{ section.id }} .collection-card__media{ height: var(--card-h-m); }
     }
+
+    /* imagens: desktop vs mobile */
     #royal-duo-{{ section.id }} .collection-card__media img{
       width: 100%;
       height: 100%;
-      object-fit: var(--fit);   /* cover = pode cortar | contain = sem cortes (pode ter bordas) */
+      object-fit: var(--fit);
       display:block;
     }
+    #royal-duo-{{ section.id }} .img-desktop{ display:block; }
+    #royal-duo-{{ section.id }} .img-mobile{ display:none; }
 
-    /* Placeholder quando coleção não tem imagem */
+    @media (max-width: 989px){
+      #royal-duo-{{ section.id }} .img-desktop{ display:none; }
+      #royal-duo-{{ section.id }} .img-mobile{ display:block; }
+    }
+
+    /* Placeholder quando não tem imagem */
     #royal-duo-{{ section.id }} .collection-card__placeholder{
       width: 100%; height: 100%;
       background: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.05));
@@ -163,15 +175,64 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
     <div class="viewport">
       <div class="track">
         {% for block in section.blocks %}
-          {% assign coll = block.settings.collection %}
-          {% if coll %}
+          {% liquid
+            assign coll = block.settings.collection
+            assign href = ''
+            if block.settings.custom_link != blank
+              assign href = block.settings.custom_link
+            elsif coll
+              assign href = coll.url
+            else
+              assign href = '#'
+            endif
+
+            assign alt_txt = block.settings.alt_text
+            if alt_txt == blank and coll
+              assign alt_txt = coll.title
+            endif
+            if alt_txt == blank
+              assign alt_txt = section.settings.title
+            endif
+
+            comment
+              Imagens (prioridade):
+              - Desktop: override_image_desktop > coll.image
+              - Mobile:  override_image_mobile  > override_image_desktop > coll.image
+            endcomment
+
+            assign img_d = nil
+            if block.settings.override_image_desktop
+              assign img_d = block.settings.override_image_desktop
+            elsif coll and coll.image
+              assign img_d = coll.image
+            endif
+
+            assign img_m = nil
+            if block.settings.override_image_mobile
+              assign img_m = block.settings.override_image_mobile
+            elsif block.settings.override_image_desktop
+              assign img_m = block.settings.override_image_desktop
+            elsif coll and coll.image
+              assign img_m = coll.image
+            endif
+          %}
+
+          {% if coll or block.settings.override_image_desktop or block.settings.override_image_mobile or block.settings.custom_link != blank %}
             <div class="slide" {{ block.shopify_attributes }}>
-              <a class="collection-card" href="{{ coll.url }}">
+              <a class="collection-card" href="{{ href }}" {% if block.settings.open_new_tab %}target="_blank" rel="noopener"{% endif %}>
                 <div class="collection-card__media">
-                  {% if block.settings.override_image %}
-                    <img class="lazyload" data-src="{{ block.settings.override_image | img_url: '800x' }}" alt="{{ coll.title | escape }}">
-                  {% elsif coll.image %}
-                    <img class="lazyload" data-src="{{ coll.image | img_url: '800x' }}" alt="{{ coll.title | escape }}">
+                  {% if img_d or img_m %}
+                    {% if img_d %}
+                      <img class="img-desktop lazyload" data-src="{{ img_d | img_url: '900x' }}" alt="{{ alt_txt | escape }}">
+                    {% else %}
+                      <div class="img-desktop collection-card__placeholder" aria-hidden="true"></div>
+                    {% endif %}
+
+                    {% if img_m %}
+                      <img class="img-mobile lazyload" data-src="{{ img_m | img_url: '700x' }}" alt="{{ alt_txt | escape }}">
+                    {% else %}
+                      <div class="img-mobile collection-card__placeholder" aria-hidden="true"></div>
+                    {% endif %}
                   {% else %}
                     <div class="collection-card__placeholder" aria-hidden="true"></div>
                   {% endif %}
@@ -255,7 +316,7 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
 
     { "type": "header", "content": "Cards • quantidade e linhas" },
     { "type": "range", "id": "per_view_desktop", "label": "Cards por tela (desktop)", "min": 1, "max": 12, "step": 1, "default": 4 },
-    { "type": "range", "id": "per_view_mobile",  "label": "Cards por tela (mobile)",  "min": 1, "max": 6,  "step": 1, "default": 1 },
+    { "type": "range", "id": "per_view_mobile",  "label": "Cards por tela (mobile)",  "min": 1, "max": 6,  "step": 1, "default": 2 },
 
     {
       "type": "select",
@@ -277,6 +338,8 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
       ],
       "default": "1"
     },
+
+    { "type": "checkbox", "id": "force_single_row_mobile", "label": "Mobile: sempre 1 linha (não quebrar pra baixo)", "default": true },
 
     { "type": "checkbox", "id": "auto_play", "label": "Auto-avanço", "default": true },
     { "type": "range", "id": "auto_interval", "label": "Intervalo (segundos)", "min": 3, "max": 12, "step": 1, "default": 5 },
@@ -304,7 +367,7 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
       "default": "1"
     },
 
-    { "type": "header", "content": "Aparência do card de coleção" },
+    { "type": "header", "content": "Aparência do card" },
     { "type": "range", "id": "card_radius", "label": "Raio dos cantos (px)", "min": 0, "max": 48, "step": 1, "default": 16 },
     { "type": "range", "id": "card_height_mobile", "label": "Altura da imagem (mobile, px)", "min": 100, "max": 500, "step": 4, "default": 200 },
     { "type": "range", "id": "card_height_desktop", "label": "Altura da imagem (desktop, px)", "min": 140, "max": 700, "step": 10, "default": 280 },
@@ -323,10 +386,16 @@ cantos arredondados e 1–2 linhas (desktop/mobile).
   "blocks": [
     {
       "type": "collection_card",
-      "name": "Card de coleção",
+      "name": "Card",
       "settings": [
-        { "type": "collection", "id": "collection", "label": "Coleção" },
-        { "type": "image_picker", "id": "override_image", "label": "Imagem personalizada (opcional)", "info": "Se vazio, usa a imagem da coleção." }
+        { "type": "collection", "id": "collection", "label": "Coleção (opcional)" },
+        { "type": "url", "id": "custom_link", "label": "Link do card (grupo/URL)" },
+        { "type": "checkbox", "id": "open_new_tab", "label": "Abrir link em nova aba", "default": true },
+        { "type": "text", "id": "alt_text", "label": "Texto ALT (opcional)" },
+
+        { "type": "header", "content": "Imagem do card" },
+        { "type": "image_picker", "id": "override_image_desktop", "label": "Imagem (desktop)", "info": "Se vazio, usa a imagem da coleção (se houver)." },
+        { "type": "image_picker", "id": "override_image_mobile", "label": "Imagem (mobile)", "info": "Se vazio, o mobile usa a imagem do desktop (ou a da coleção)." }
       ]
     }
   ],

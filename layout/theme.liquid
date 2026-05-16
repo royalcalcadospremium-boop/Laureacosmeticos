@@ -22,9 +22,10 @@
   src="https://www.facebook.com/tr?id=1142237543398804&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="{{ settings.accent_color }}">
-    <link href="https://use.fontawesome.com/releases/v5.0.1/css/all.css" rel="stylesheet">
+    <link rel="preload" href="https://use.fontawesome.com/releases/v5.0.1/css/all.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://use.fontawesome.com/releases/v5.0.1/css/all.css" rel="stylesheet"></noscript>
 
     {%- capture seo_page_title -%}
       {%- if request.page_type == 'search' and search.terms != blank -%}
@@ -37,7 +38,11 @@
     <title>{{- seo_page_title -}}</title>
 
     {%- if page_description -%}
-      <meta name="description" content="{{ page_description | escape }}">
+      {%- if current_page and current_page > 1 -%}
+        <meta name="description" content="{{ page_description | escape }} &ndash; {{ 'general.meta.page' | t: page: current_page }}">
+      {%- else -%}
+        <meta name="description" content="{{ page_description | escape }}">
+      {%- endif -%}
     {%- endif -%}
 
     <link rel="canonical" href="{{ canonical_url }}">
@@ -55,8 +60,8 @@
     <link rel="dns-prefetch" href="https://maps.googleapis.com">
     <link rel="dns-prefetch" href="https://maps.gstatic.com">
     
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-migrate-3.4.0.min.js" integrity="sha256-mBCu5+bVfYzOqpYyK4jm30ZxAZRomuErKEFJFIyrwvM=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous" defer></script>
+    <script src="https://code.jquery.com/jquery-migrate-3.4.0.min.js" integrity="sha256-mBCu5+bVfYzOqpYyK4jm30ZxAZRomuErKEFJFIyrwvM=" crossorigin="anonymous" defer></script>
    
     {% if settings.ali_hunter_enable %}
       {% render 'blockalihtr' %}
@@ -66,68 +71,34 @@
     {% render 'css-variables' %}
 
     {{ content_for_header }}
-    {%include "setbg"%}
     <link rel="stylesheet" href="{{ 'theme.css' | asset_url }}">
-    <link rel="stylesheet" href="{{ 'laurea-gummy-polish.css' | asset_url }}">
+    <link rel="stylesheet" href="{{ 'royal-custom.css' | asset_url }}">
 
     {% render 'microdata-schema' %}
     {% render 'fk-lck' %}
   
-    <!-- INICIO DO BLOQUEADOR -->
-  
     {% if settings.botao_direito_enable %}
-        <script type="text/javascript">
-            var message="Desculpe, o clique com o botão direito foi desativado.";
-            function clickIE() {if (document.all) {(message);return false;}}
-            function clickNS(e) {if
-            (document.layers||(document.getElementById&&!document.all)) {
-                if (e.which==2||e.which==3) {(message);return false;}}}
-            if (document.layers)
-            {document.captureEvents(Event.MOUSEDOWN);document.onmousedown=clickNS;}
-            else{document.onmouseup=clickNS;document.oncontextmenu=clickIE;}
-            document.oncontextmenu=new Function("return false")
-        </script>
+      <script>
+        document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      </script>
     {% endif %}
 
     {% if settings.atalho_f12_enable %}
-        <script>
-            document.onkeydown = function(e) {
-                if(event.keyCode == 123) {
-                    return false;
-                }
-                if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)){
-                    return false;
-                }
-                if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)){
-                    return false;
-                }
-                if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)){
-                    return false;
-                }
-            }
-        </script>
+      <script>
+        document.addEventListener('keydown', function (e) {
+          var key = e.key;
+          if (key === 'F12') { e.preventDefault(); return; }
+          if (e.ctrlKey && e.shiftKey && (key === 'I' || key === 'i' || key === 'J' || key === 'j')) { e.preventDefault(); return; }
+          if (e.ctrlKey && (key === 'U' || key === 'u')) { e.preventDefault(); }
+        });
+      </script>
     {% endif %}
 
     {% if settings.selecionar_conteudo_enable %}
-        <script>
-            function disableselect(e) {
-                return false;
-            }
-
-            function reEnable() {
-                return true;
-            }
-
-            document.onselectstart = new Function("return false");
-
-            if (window.sidebar) {
-                document.onmousedown = disableselect;
-                document.onclick = reEnable;
-            }
-        </script>
+      <script>
+        document.addEventListener('selectstart', function (e) { e.preventDefault(); });
+      </script>
     {% endif %}
-  
-    <!-- FINAL DO BLOQUEADOR -->
     
     <script>
       // This allows to expose several variables to the global scope, to be used in scripts
@@ -181,7 +152,6 @@
       <script src="{{ 'customer_area.js' | shopify_asset_url }}" defer></script>
     {%- endif -%}
 
-    <script src="//cdn.polyfill.io/v3/polyfill.min.js?unknown=polyfill&features=fetch,Element.prototype.closest,Element.prototype.matches,Element.prototype.remove,Element.prototype.classList,Array.prototype.includes,Array.prototype.fill,String.prototype.includes,String.prototype.padStart,Object.assign,CustomEvent,Intl,URL,DOMTokenList,IntersectionObserver,IntersectionObserverEntry" defer></script><!--thi@gohsil@--> 
     <script src="{{ 'theme.min.js' | asset_url }}" defer></script>
     <script src="{{ 'custom.js' | asset_url }}" defer></script>
 
@@ -214,19 +184,21 @@
   <meta property="og:url" content="{{ shop.url }}{{ collection.url }}">
   
   {% if collection.image %}
-    <meta property="og:image" content="{{ collection.image | img_url: '1200x630' }}">
+    <meta property="og:image" content="https:{{ collection.image | img_url: '1200x630' }}">
+    <meta property="og:image:secure_url" content="https:{{ collection.image | img_url: '1200x630' }}">
   {% else %}
-    <meta property="og:image" content="{{ shop.logo | img_url: '1200x630' }}">
+    <meta property="og:image" content="https:{{ shop.logo | img_url: '1200x630' }}">
+    <meta property="og:image:secure_url" content="https:{{ shop.logo | img_url: '1200x630' }}">
   {% endif %}
 {%- endif -%}
 
 </head>
 
-  <body class="warehouse--v1 {% if settings.animation_image_zoom %}features--animate-zoom{% endif%} template-{{ request.page_type | handle }} {% if request.page_type contains '/' %}template-{{ request.page_type | split: '/' | last | handle }}{% endif %}" data-instant-intensity="viewport"><!--thi@gohsil@-->  
+  <body class="warehouse--v1 {% if settings.animation_image_zoom %}features--animate-zoom{% endif%} template-{{ request.page_type | handle }} {% if request.page_type contains '/' %}template-{{ request.page_type | split: '/' | last | handle }}{% endif %}" data-instant-intensity="viewport">  
 
     <span class="loading-bar"></span>
 
-    {% section 'announcement-bar' %}
+{% section 'announcement-bar' %}
 
     {%- unless request.page_type == 'cart' -%}
       {%- comment -%}As required by Shopify rules, popup must be removed on cart page to remove distraction{%- endcomment -%}
@@ -342,6 +314,8 @@
 
 {% render 'ou-12x' %}
 
+{% section 'cart-drawer' %}
+
 <script>
 (function(){
   // ==== OPEN CART (ultra-compat) ====
@@ -416,6 +390,152 @@
 {% section 'cart-drawer' %}
 {{ 'cart-drawer.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
+
+<!-- ── Scroll Reveal: Slide Up ── -->
+<style>
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.45s ease-out, transform 0.45s ease-out;
+    will-change: opacity, transform;
+  }
+  .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+<script>
+(function () {
+  'use strict';
+
+  /*
+   * Todos os cards/itens de grade do site — foto e texto sobem juntos.
+   */
+  var GRID_ITEMS = [
+    /* Produtos */
+    '.product-item',
+    '.product-card',
+    '.collection-item',
+    /* Coleções */
+    '.collection-card',
+    '.collection-block-item',
+    /* Artigos / Blog */
+    '.article-item',
+    '.blog-posts__item',
+    '.blog-sidebar__post-item',
+    '.blog-sidebar__item',
+    /* Promos / Banners */
+    '.promo-block',
+    '.offer-item',
+    '.mosaic__item',
+    '.promotion-list__item',
+    /* Links e logos */
+    '.quick-links__link',
+    '.logo-list__item',
+    /* Cards customizados Royal */
+    '.royal-card',
+    '.royal-cats__item',
+    '.royal-flash__item',
+    '.royal-tabs-cards .tab-item',
+    '.royal-banner',
+    /* Cards de terceiros / snippets */
+    '.rc-card',
+    '.mco-card',
+    '.model-card',
+    '.nb-rec-card',
+    '.rcd__item',
+    '.rcd__upsell-card',
+    /* Genéricos */
+    '.card',
+    '.block-list__item',
+    '.grid__cell',
+    '.team__block-item',
+    '.faq__item',
+    '.video-item',
+    '.recently-viewed__item',
+    '.text-with-icons__item',
+    '.footer__block-item',
+    '.footer__aside-item'
+  ].join(', ');
+
+  /*
+   * Seções simples sem grade interna: anima os filhos diretos.
+   */
+  var BLOCK_PARENTS = [
+    '.image-with-text',
+    '.rich-text__content',
+    '.slideshow__slide',
+    '.newsletter',
+    '.video__wrapper',
+    '.map__wrapper',
+    '.page-content',
+    '.featured-product__info',
+    '.featured-product__media'
+  ].join(', ');
+
+  function addReveal(el, idx) {
+    el.classList.add('scroll-reveal');
+    el._revealIdx = idx || 0;
+  }
+
+  function init() {
+    if (!('IntersectionObserver' in window)) return;
+
+    /* 1) Itens de grade */
+    var gridEls = Array.from(document.querySelectorAll(GRID_ITEMS));
+
+    /* 2) Blocos de seção simples (excluindo os que já têm grade dentro) */
+    var blockEls = Array.from(document.querySelectorAll(BLOCK_PARENTS)).filter(function (el) {
+      return !el.querySelector(GRID_ITEMS);
+    });
+
+    /* 3) Fallback: seções que não foram cobertas acima */
+    var coveredSections = new Set();
+    gridEls.concat(blockEls).forEach(function (el) {
+      var sec = el.closest('.shopify-section');
+      if (sec) coveredSections.add(sec);
+    });
+
+    var fallbackEls = Array.from(document.querySelectorAll('#main .shopify-section, footer .shopify-section'))
+      .filter(function (sec) { return !coveredSections.has(sec); })
+      .map(function (sec) { return Array.from(sec.children); })
+      .reduce(function (acc, arr) { return acc.concat(arr); }, []);
+
+    /* Junta tudo e remove duplicatas pai/filho */
+    var all = gridEls.concat(blockEls).concat(fallbackEls);
+    var unique = all.filter(function (el, i, arr) {
+      return arr.indexOf(el) === i &&
+        !arr.some(function (p) { return p !== el && p.contains(el); });
+    });
+
+    unique.forEach(function (el) { el.classList.add('scroll-reveal'); });
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var siblings = Array.from(
+          entry.target.parentElement.querySelectorAll('.scroll-reveal:not(.is-visible)')
+        );
+        var idx = siblings.indexOf(entry.target);
+        entry.target.style.transitionDelay = Math.min(idx, 5) * 55 + 'ms';
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, {
+      threshold: 0.06,
+      rootMargin: '0px 0px -30px 0px'
+    });
+
+    unique.forEach(function (el) { observer.observe(el); });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
 
 </body>
 </html>

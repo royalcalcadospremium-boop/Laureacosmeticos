@@ -1,0 +1,889 @@
+/* ============================================================
+   Royal Atacado — Custom styles
+   Gerado automaticamente. Não editar manualmente.
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   1. ANNOUNCEMENT BAR — 3 modalidades
+   ---------------------------------------------------------- */
+.announcement-bar--modalities .announcement-bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.announcement-bar__modalities-row {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.announcement-bar__modality-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: inherit;
+  text-decoration: none;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.12);
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.announcement-bar__modality-badge:hover {
+  background: rgba(255,255,255,0.22);
+  color: inherit;
+}
+
+.announcement-bar__modality-badge strong {
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.announcement-bar__modality-detail {
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.announcement-bar__modality-sep {
+  opacity: 0.3;
+  font-size: 14px;
+  padding: 0 4px;
+}
+
+@media (max-width: 640px) {
+  .announcement-bar__modality-sep { display: none; }
+  .announcement-bar__modality-detail { display: inline; }
+
+  .announcement-bar--modalities .container {
+    overflow: hidden;
+    height: 28px;
+  }
+
+  .announcement-bar__modalities-row {
+    flex-direction: column !important;
+    gap: 0 !important;
+    flex-wrap: nowrap !important;
+    animation: royal-bar-cycle 10s ease-in-out infinite;
+  }
+
+  .announcement-bar__modality-badge {
+    font-size: 10.5px;
+    padding: 1px 8px;
+    height: 28px;
+    justify-content: center;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  @keyframes royal-bar-cycle {
+    0%, 28%   { transform: translateY(0); }
+    33%, 61%  { transform: translateY(-28px); }
+    66%, 94%  { transform: translateY(-56px); }
+    99%, 100% { transform: translateY(0); }
+  }
+}
+
+/* ----------------------------------------------------------
+   2. PRODUCT CARD — badges de modalidade
+   ---------------------------------------------------------- */
+.product-item__modality-badges {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin: 6px 0 4px;
+}
+
+.modality-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.modality-badge svg {
+  flex-shrink: 0;
+}
+
+.modality-badge--atacado {
+  background: rgba(0, 118, 255, 0.10);
+  color: #0055cc;
+  border: 1px solid rgba(0,118,255,0.2);
+}
+
+.modality-badge--drop {
+  background: rgba(112, 45, 250, 0.10);
+  color: #5a22d0;
+  border: 1px solid rgba(112,45,250,0.2);
+}
+
+.modality-badge--varejo {
+  background: rgba(0, 216, 100, 0.10);
+  color: #00843d;
+  border: 1px solid rgba(0,216,100,0.2);
+}
+
+/* ----------------------------------------------------------
+   3. WHATSAPP BUTTON — fix mobile overlap
+   ---------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* AddZap / common WhatsApp float widgets */
+  .whatsapp-float,
+  .zap-float,
+  #whatsapp-button,
+  .addchat-btn,
+  [class*="whatsapp"][class*="float"],
+  [id*="whatsapp"],
+  a[href*="wa.me"],
+  a[href*="whatsapp.com/send"] {
+    bottom: 80px !important;
+  }
+}
+
+/* ----------------------------------------------------------
+   4. COOKIE BAR — move to thin bottom strip
+   ---------------------------------------------------------- */
+.cookie-bar {
+  position: fixed !important;
+  bottom: 0 !important;
+  top: auto !important;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  padding: 10px 0 !important;
+  box-shadow: 0 -2px 16px rgba(0,0,0,0.12);
+}
+
+.cookie-bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cookie-bar__text {
+  font-size: 12px !important;
+  line-height: 1.4;
+  flex: 1;
+  min-width: 200px;
+}
+
+.cookie-bar__button {
+  flex-shrink: 0;
+  padding: 6px 18px !important;
+  font-size: 12px !important;
+  min-height: 34px !important;
+}
+
+@media (max-width: 640px) {
+  .cookie-bar__inner { flex-direction: column; gap: 8px; text-align: center; }
+  .cookie-bar__button { width: 100%; }
+}
+
+/* ----------------------------------------------------------
+   5. FOOTER — CNPJ & disclaimer
+   ---------------------------------------------------------- */
+.footer__cnpj-line {
+  font-size: 9pt;
+  opacity: 0.65;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* ----------------------------------------------------------
+   6. PRODUCT PAGE — Modality selector + Download button
+   ---------------------------------------------------------- */
+.pinfo-modality {
+  margin: 18px 0 14px;
+  border: 1px solid oklch(90% 0.005 248);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.pinfo-modality__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: oklch(50% 0.01 248);
+  padding: 10px 14px 8px;
+  margin: 0;
+  border-bottom: 1px solid oklch(93% 0.005 248);
+}
+
+.pinfo-modality__tabs {
+  display: flex;
+  border-bottom: 1px solid oklch(93% 0.005 248);
+}
+
+.pinfo-modality__tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: oklch(50% 0.01 248);
+  background: transparent;
+  border: none;
+  border-right: 1px solid oklch(93% 0.005 248);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pinfo-modality__tab:last-child {
+  border-right: none;
+}
+
+.pinfo-modality__tab:hover {
+  background: oklch(96% 0.005 248);
+  color: oklch(20% 0.01 248);
+}
+
+.pinfo-modality__tab--active {
+  background: oklch(55% 0.22 145 / 0.07);
+  color: oklch(35% 0.18 145);
+}
+
+.pinfo-modality__panels {
+  padding: 12px 14px;
+}
+
+.pinfo-modality__panel {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: oklch(35% 0.01 248);
+}
+
+.pinfo-modality__panel strong {
+  color: oklch(18% 0.01 248);
+}
+
+.pinfo-modality__cta {
+  display: block;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: oklch(45% 0.18 145);
+  padding: 8px;
+  border-top: 1px solid oklch(93% 0.005 248);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.pinfo-modality__cta:hover {
+  background: oklch(96% 0.005 248);
+}
+
+.pinfo-download {
+  margin: 10px 0 16px;
+  text-align: center;
+}
+
+.pinfo-download__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  background: oklch(20% 0.01 248);
+  color: oklch(96% 0.005 248);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.pinfo-download__btn:hover {
+  opacity: 0.85;
+  color: oklch(96% 0.005 248);
+}
+
+.pinfo-download__hint {
+  font-size: 10.5px;
+  color: oklch(55% 0.01 248);
+  margin: 6px 0 0;
+}
+
+/* ----------------------------------------------------------
+   7. COLLECTION PAGE — SEO subtitle
+   ---------------------------------------------------------- */
+.rc-collection-desc {
+  font-size: 12px;
+  color: oklch(50% 0.01 248);
+  margin: 0 60px 0 0;
+  line-height: 1.4;
+}
+
+/* ----------------------------------------------------------
+   7. HERO V2 — dark shell overlay sobre o slideshow
+   ---------------------------------------------------------- */
+#shopify-section-slideshow {
+  position: relative;
+}
+
+.hero-v2-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    oklch(9% 0.018 248 / 0.82) 0%,
+    oklch(9% 0.018 248 / 0.55) 55%,
+    oklch(9% 0.018 248 / 0.08) 100%
+  );
+}
+
+.hero-v2-overlay__inner {
+  max-width: 640px;
+  padding: 32px 24px;
+}
+
+.hero-v2-overlay__eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: oklch(72% 0.18 248);
+  margin: 0 0 10px;
+  opacity: 0.9;
+}
+
+.hero-v2-overlay__headline {
+  font-size: clamp(22px, 4vw, 44px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: oklch(97% 0.005 248);
+  margin: 0 0 12px;
+}
+
+.hero-v2-overlay__subline {
+  font-size: clamp(13px, 1.5vw, 16px);
+  font-weight: 400;
+  color: oklch(80% 0.03 248);
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.hero-v2-overlay__ctas {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  pointer-events: all;
+}
+
+.hero-v2-overlay__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  white-space: nowrap;
+}
+
+.hero-v2-overlay__btn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.hero-v2-overlay__btn--primary {
+  background: oklch(55% 0.22 145);
+  color: oklch(98% 0 0);
+}
+
+.hero-v2-overlay__btn--secondary {
+  background: oklch(45% 0.18 145 / 0.15);
+  color: oklch(97% 0.005 248);
+  border: 1.5px solid oklch(45% 0.18 145 / 0.5);
+  backdrop-filter: blur(4px);
+}
+
+@media (max-width: 768px) {
+  .hero-v2-overlay {
+    align-items: flex-end;
+    background: linear-gradient(
+      0deg,
+      oklch(9% 0.018 248 / 0.88) 0%,
+      oklch(9% 0.018 248 / 0.5) 55%,
+      oklch(9% 0.018 248 / 0.05) 100%
+    );
+  }
+
+  .hero-v2-overlay__inner {
+    max-width: 100%;
+    padding: 20px 16px 24px;
+  }
+
+  .hero-v2-overlay__headline {
+    font-size: 22px;
+  }
+
+  .hero-v2-overlay__subline {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .hero-v2-overlay__btn {
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+}
+
+/* ----------------------------------------------------------
+   7. TRUST BAR — text-with-icons upgrade
+   ---------------------------------------------------------- */
+.section--tight .text-with-icons {
+  padding: 20px 0;
+  border-top: 1px solid oklch(92% 0.005 248);
+  border-bottom: 1px solid oklch(92% 0.005 248);
+}
+
+.text-with-icons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+}
+
+.text-with-icons__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  border-right: 1px solid oklch(92% 0.005 248);
+}
+
+.text-with-icons__item:last-child {
+  border-right: none;
+}
+
+.text-with-icons__icon-wrapper {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: oklch(55% 0.22 145 / 0.08);
+  border-radius: 8px;
+  color: oklch(40% 0.18 145);
+}
+
+.text-with-icons__icon-wrapper svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.5;
+}
+
+.text-with-icons__title {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  margin: 0 0 2px !important;
+  color: oklch(18% 0.01 248);
+}
+
+.text-with-icons__content {
+  font-size: 11.5px !important;
+  line-height: 1.4;
+  color: oklch(45% 0.01 248);
+  margin: 0 !important;
+}
+
+.text-with-icons__content p {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .text-with-icons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .text-with-icons__item {
+    border-right: none;
+    border-bottom: 1px solid oklch(92% 0.005 248);
+    padding: 12px 16px;
+  }
+
+  .text-with-icons__item:nth-child(2n) {
+    border-left: 1px solid oklch(92% 0.005 248);
+  }
+
+  .text-with-icons__item:nth-last-child(-n+2) {
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .text-with-icons {
+    grid-template-columns: 1fr;
+  }
+
+  .text-with-icons__item {
+    border-left: none !important;
+  }
+
+  .text-with-icons__item:last-child {
+    border-bottom: none;
+  }
+}
+
+/* ----------------------------------------------------------
+   9. WHATSAPP CTA SECTION
+   ---------------------------------------------------------- */
+.royal-wacta {
+  background: oklch(12% 0.018 248);
+  padding: 52px 0;
+}
+
+.royal-wacta__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.royal-wacta__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: oklch(60% 0.18 145);
+  margin: 0 0 8px;
+}
+
+.royal-wacta__headline {
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 800;
+  color: oklch(96% 0.005 248);
+  margin: 0 0 8px;
+  line-height: 1.15;
+}
+
+.royal-wacta__subline {
+  font-size: 14px;
+  color: oklch(65% 0.01 248);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.royal-wacta__text {
+  flex: 1;
+  min-width: 260px;
+}
+
+.royal-wacta__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.royal-wacta__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  background: oklch(52% 0.22 145);
+  color: oklch(98% 0 0);
+}
+
+.royal-wacta__btn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+  color: oklch(98% 0 0);
+}
+
+.royal-wacta__btn--secondary {
+  background: transparent;
+  color: oklch(80% 0.01 248);
+  border: 1.5px solid oklch(40% 0.01 248);
+}
+
+.royal-wacta__btn--secondary:hover {
+  color: oklch(96% 0.005 248);
+  border-color: oklch(60% 0.01 248);
+}
+
+@media (max-width: 768px) {
+  .royal-wacta {
+    padding: 36px 0;
+  }
+
+  .royal-wacta__inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 24px;
+  }
+
+  .royal-wacta__actions {
+    justify-content: center;
+  }
+
+  .royal-wacta__btn {
+    padding: 12px 20px;
+    font-size: 13px;
+  }
+}
+
+/* ----------------------------------------------------------
+   10. PRODUCT PAGE — Size guide + urgency badge
+   ---------------------------------------------------------- */
+.size-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.size-section__label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: oklch(30% 0.01 248);
+}
+
+.size-guide-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: oklch(45% 0.18 248);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.size-guide-trigger:hover {
+  color: oklch(30% 0.18 248);
+}
+
+.product-urgency {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: oklch(35% 0.2 30);
+  background: oklch(35% 0.2 30 / 0.07);
+  border: 1px solid oklch(35% 0.2 30 / 0.2);
+  border-radius: 6px;
+  padding: 7px 12px;
+  margin-bottom: 10px;
+}
+
+.product-urgency strong {
+  font-weight: 700;
+}
+
+/* Size guide modal */
+.size-guide-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.size-guide-modal[aria-hidden="false"] {
+  pointer-events: all;
+  opacity: 1;
+}
+
+.size-guide-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: oklch(10% 0.01 248 / 0.55);
+}
+
+.size-guide-modal__panel {
+  position: relative;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.size-guide-modal[aria-hidden="false"] .size-guide-modal__panel {
+  transform: translateY(0);
+}
+
+.size-guide-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid oklch(93% 0.005 248);
+  position: sticky;
+  top: 0;
+  background: #fff;
+}
+
+.size-guide-modal__header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: oklch(15% 0.01 248);
+}
+
+.size-guide-modal__close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: oklch(50% 0.01 248);
+  padding: 4px;
+  display: flex;
+}
+
+.size-guide-modal__body {
+  padding: 16px 20px;
+}
+
+.size-guide-modal__intro {
+  font-size: 12.5px;
+  color: oklch(45% 0.01 248);
+  margin: 0 0 14px;
+}
+
+.size-guide-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.size-guide-modal__table th {
+  background: oklch(96% 0.005 248);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: oklch(40% 0.01 248);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.size-guide-modal__table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid oklch(94% 0.005 248);
+  color: oklch(20% 0.01 248);
+}
+
+.size-guide-modal__table tr:last-child td {
+  border-bottom: none;
+}
+
+.size-guide-modal__tip {
+  font-size: 11.5px;
+  color: oklch(50% 0.01 248);
+  margin: 14px 0 0;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .size-guide-modal {
+    align-items: center;
+  }
+
+  .size-guide-modal__panel {
+    border-radius: 12px;
+    margin: 24px;
+    max-height: 80vh;
+    transform: translateY(12px) scale(0.97);
+  }
+
+  .size-guide-modal[aria-hidden="false"] .size-guide-modal__panel {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ----------------------------------------------------------
+   LAYOUT: FULL WIDTH + RESPONSIVIDADE
+   ---------------------------------------------------------- */
+
+/* Container chega nas extremidades em todas as páginas */
+.container,
+.container--flush {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Galeria + info do produto: previne corte de conteúdo */
+.product-block-list {
+  overflow: visible !important;
+  box-sizing: border-box;
+}
+
+/* Painel de info não some ao redimensionar */
+@media screen and (min-width: 1000px) {
+  .product-block-list__item--info {
+    overflow-x: visible !important;
+  }
+}
+
+/* Corrige tamanhos intermediários (tablet-landscape / janela reduzida) */
+@media screen and (min-width: 1000px) and (max-width: 1280px) {
+  .product-block-list__wrapper {
+    width: calc(50% - 8px) !important;
+  }
+  .product-block-list__item--info {
+    width: calc(50% - 8px) !important;
+  }
+}
+
+/* Garante que todo o site não crie scroll horizontal */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+* { box-sizing: border-box; }
+
+/* Imagens sempre dentro do container */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}

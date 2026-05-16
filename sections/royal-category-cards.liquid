@@ -1,279 +1,325 @@
 {% comment %}
-Royal • Categorias (layout print) v1.0
-- Desktop: cards em grid com título + imagem + botão "Ver Mais"
-- Mobile: cards pill (título esquerda + imagem direita), sem botão
+Royal • Categoria Cards v9.6.1
+- Não sobrepõe a seção de cima
+- Desktop: espaço acima até 300 (step 3 = 101 etapas)
+- Mobile: espaço acima até 400 (step 4 = 101 etapas) ✅ corrigido (Shopify limit)
+- Ajuste fino Y Desktop/Mobile (-100..100 step 2)
 {% endcomment %}
 
-<section id="royal-cats-print-{{ section.id }}" class="royal-cats-print">
-  {% render 'royal-overlap', id: section.id %}
+<section id="royal-cats-{{ section.id }}"
+  class="royal-cats{% if section.settings.desktop_compact %} desktop-compact{% endif %}">
 
   {% liquid
-    assign blocks = section.blocks | where: "type", "cat"
+    assign is_home = false
+    if request.page_type == 'index' or template.name == 'index'
+      assign is_home = true
+    endif
   %}
 
   <style>
-    #royal-cats-print-{{ section.id }}{
-      --bg: {{ section.settings.bg | default: '#F6D8E6' }};
-      --title: {{ section.settings.title_color | default: '#2B2B2B' }};
-      --text: {{ section.settings.text_color | default: '#2B2B2B' }};
-      --btn-bg: {{ section.settings.btn_bg | default: '#D93B7D' }};
-      --btn-text: {{ section.settings.btn_text | default: '#ffffff' }};
+    #royal-cats-{{ section.id }}{
+      /* Ajustes de posição (editor) */
+      --space-top-d: {{ section.settings.space_top_desktop | default: 0 }}px;
+      --shift-y-d:   {{ section.settings.shift_y_desktop | default: 0 }}px;
 
-      --card-radius: {{ section.settings.card_radius | default: 26 }}px;
-      --card-pad-d: 22px;
-      --card-pad-m: 18px;
+      --space-top-m: {{ section.settings.space_top_mobile | default: 0 }}px;
+      --shift-y-m:   {{ section.settings.shift_y_mobile | default: 0 }}px;
 
-      --gap-d: 18px;
-      --gap-m: 16px;
+      /* Diâmetros via settings */
+      --diam-d: {{ section.settings.media_standard_desktop | default: 120 }}px;
+      --diam-d-compact: {{ section.settings.media_compact_desktop | default: 100 }}px;
+      --diam-m: {{ section.settings.media_compact_mobile | default: 80 }}px;
 
-      --img-max-d: 150px;
-      --img-max-m: 76px;
+      --diam-current: var(--diam-d);
 
-      background: var(--bg);
-      padding: clamp(22px, 3vw, 36px) 0;
+      /* Quantidade / gap */
+      --cards-d: {{ section.settings.desktop_fit_count | default: 5 }};
+      --gap-d-auto: calc((100% - (var(--cards-d) * var(--diam-current))) / (var(--cards-d) - 1));
+      --gap: max(8px, var(--gap-d-auto));
+
+      --gap-m: 14px;
+      --visible-m: {{ section.settings.mobile_visible | default: 5 }};
+
+      /* Cores */
+      --text: {{ settings.text_color | default: '#111111' }};
+
       position: relative;
-      z-index: 2;
+      text-align: center;
+      isolation: isolate;
+      z-index: 0;
+
+      /* espaço REAL acima + ajuste fino */
+      padding-top: var(--space-top-d);
+      transform: translateY(var(--shift-y-d));
+
+      margin: 0;
     }
 
-    #royal-cats-print-{{ section.id }} .container{
+    @media (min-width: 992px){
+      #royal-cats-{{ section.id }}.desktop-compact{ --diam-current: var(--diam-d-compact); }
+    }
+
+    @media (max-width: 991px){
+      #royal-cats-{{ section.id }}{
+        padding-top: var(--space-top-m);
+        transform: translateY(var(--shift-y-m));
+      }
+      #royal-cats-{{ section.id }} .track{ gap: var(--gap-m); }
+      #royal-cats-{{ section.id }} .card{
+        min-width: calc((100% - (var(--gap-m) * (var(--visible-m) - 1))) / var(--visible-m));
+        flex: 0 0 calc((100% - (var(--gap-m) * (var(--visible-m) - 1))) / var(--visible-m));
+        width: auto;
+      }
+      #royal-cats-{{ section.id }} .media{ width: var(--diam-m); height: var(--diam-m); }
+      #royal-cats-{{ section.id }} .title{ font-size: 12px; }
+    }
+
+    /* Container alinhado ao tema */
+    #royal-cats-{{ section.id }} .container{
       width: 100%;
       max-width: 1480px;
-      margin: 0 auto;
+      margin-left: auto;
+      margin-right: auto;
       padding-left: var(--mobile-container-gutter, 20px);
       padding-right: var(--mobile-container-gutter, 20px);
     }
     @media (min-width: 641px) and (max-width: 1023px){
-      #royal-cats-print-{{ section.id }} .container{
+      #royal-cats-{{ section.id }} .container{
         padding-left: var(--tablet-container-gutter, 28px);
         padding-right: var(--tablet-container-gutter, 28px);
       }
     }
     @media (min-width: 1024px){
-      #royal-cats-print-{{ section.id }} .container{
+      #royal-cats-{{ section.id }} .container{
         padding-left: var(--desktop-container-gutter, 36px);
         padding-right: var(--desktop-container-gutter, 36px);
       }
     }
 
-    #royal-cats-print-{{ section.id }} .heading{
-      font-size: clamp(22px, 2.1vw, 32px);
-      font-weight: 800;
-      letter-spacing: .2px;
-      color: var(--title);
-      text-align: center;
-      margin: 0 0 18px;
+    /* Trilho */
+    #royal-cats-{{ section.id }} .viewport{ position: relative; overflow: hidden; }
+    #royal-cats-{{ section.id }} .track{
+      display: flex; flex-wrap: nowrap;
+      gap: var(--gap);
+      justify-content: flex-start;
+      overflow-x: auto; overflow-y: hidden;
+      padding: 0;
+      /* pan-y: dedo no card so passa scroll VERTICAL pra pagina (sem sambar).
+         JS controla o drag horizontal continuo (sem snap-type que cria "pulo"). */
+      touch-action: pan-y;
+      overscroll-behavior: contain;
+      scroll-behavior: smooth;
+      /* snap proximity (suave). Desativado durante drag via .rcd-dragging */
+      scroll-snap-type: x proximity;
+    }
+    #royal-cats-{{ section.id }} .track.rcd-dragging{
+      scroll-snap-type: none !important;
+      scroll-behavior: auto !important;
+    }
+    #royal-cats-{{ section.id }} .track::-webkit-scrollbar{ display: none; }
+
+    /* Card */
+    #royal-cats-{{ section.id }} .card{
+      scroll-snap-align: center;
+      width: var(--diam-current);
+      min-width: var(--diam-current);
+      flex: 0 0 var(--diam-current);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      text-decoration: none; color: var(--text);
+      background: transparent !important;
+      box-shadow: none !important;
+      border: 0 !important;
     }
 
-    /* ===== Desktop (grid) ===== */
-    #royal-cats-print-{{ section.id }} .grid{
-      display: grid;
-      gap: var(--gap-d);
-      grid-template-columns: repeat({{ section.settings.desktop_cols | default: 4 }}, minmax(0, 1fr));
-      align-items: stretch;
-    }
-
-    #royal-cats-print-{{ section.id }} .card{
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: var(--text);
-      border-radius: var(--card-radius);
-      padding: var(--card-pad-d);
-      background: #fff;
-      box-shadow: 0 10px 26px rgba(0,0,0,.08);
+    #royal-cats-{{ section.id }} .media{
+      width: var(--diam-current);
+      height: var(--diam-current);
+      border-radius: 50%;
       overflow: hidden;
-      position: relative;
-      min-height: 260px;
+      background: transparent !important;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .18s ease;
     }
-
-    #royal-cats-print-{{ section.id }} .card__title{
-      font-size: 18px;
-      font-weight: 900;
-      text-transform: uppercase;
-      margin: 2px 0 14px;
-      text-align: center;
-      line-height: 1.15;
-    }
-
-    #royal-cats-print-{{ section.id }} .card__media{
-      width: 100%;
-      flex: 1 1 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 14px;
-    }
-
-    #royal-cats-print-{{ section.id }} .card__media img{
-      width: auto;
-      max-width: 92%;
-      max-height: var(--img-max-d);
-      object-fit: contain;
+    #royal-cats-{{ section.id }} .card:hover .media{ transform: scale(1.03); }
+    #royal-cats-{{ section.id }} .media img{
+      width: 100%; height: 100%;
+      object-fit: cover;
       display: block;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,.12));
     }
 
-    #royal-cats-print-{{ section.id }} .card__btn{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 18px;
-      border-radius: 999px;
-      background: var(--btn-bg);
-      color: var(--btn-text);
-      font-weight: 800;
-      font-size: 13px;
-      line-height: 1;
-      border: 0;
-      cursor: pointer;
-      transition: transform .15s ease, opacity .15s ease;
-      margin-top: 4px;
+    #royal-cats-{{ section.id }} .title{
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+      max-width: 100%;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    #royal-cats-print-{{ section.id }} .card:hover .card__btn{ transform: translateY(-1px); }
-    #royal-cats-print-{{ section.id }} .card:active .card__btn{ transform: translateY(0px); opacity: .95; }
-
-    /* cor por bloco */
-    #royal-cats-print-{{ section.id }} .card[data-bg]{
-      background: var(--card-bg, #fff);
+    /* Setas */
+    #royal-cats-{{ section.id }} .nav{
+      display:flex;
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      width:40px; height:40px;
+      border-radius:50%;
+      background:#fff;
+      border:none;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(0,0,0,.15);
+      align-items:center;
+      justify-content:center;
+      z-index: 2;
     }
-
-    /* ===== Mobile (pills) ===== */
-    @media (max-width: 991px){
-      #royal-cats-print-{{ section.id }}{
-        padding: 18px 0 24px;
-      }
-
-      #royal-cats-print-{{ section.id }} .grid{
-        grid-template-columns: 1fr;
-        gap: var(--gap-m);
-      }
-
-      #royal-cats-print-{{ section.id }} .card{
-        min-height: 0;
-        padding: var(--card-pad-m);
-        border-radius: 999px;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: none;
-      }
-
-      #royal-cats-print-{{ section.id }} .card__title{
-        margin: 0;
-        text-align: left;
-        font-size: 16px;
-        max-width: 55%;
-      }
-
-      #royal-cats-print-{{ section.id }} .card__media{
-        margin: 0;
-        width: 45%;
-        justify-content: flex-end;
-      }
-
-      #royal-cats-print-{{ section.id }} .card__media img{
-        max-height: var(--img-max-m);
-        max-width: 100%;
-      }
-
-      /* sem botão no mobile (igual print) */
-      #royal-cats-print-{{ section.id }} .card__btn{
-        display: none !important;
-      }
+    #royal-cats-{{ section.id }} .nav svg{ width:22px; height:22px; }
+    #royal-cats-{{ section.id }} .nav.prev{ left:-6px; }
+    #royal-cats-{{ section.id }} .nav.next{ right:-6px; }
+    #royal-cats-{{ section.id }}.at-start .nav.prev{ display:none; }
+    #royal-cats-{{ section.id }}.at-end .nav.next{ display:none; }
+    /* Mobile: ESCONDE setas (so swipe horizontal touch) */
+    @media (max-width: 767px){
+      #royal-cats-{{ section.id }} .nav{ display: none !important; }
     }
   </style>
 
-  <div class="container">
-    {% if section.settings.heading != blank %}
-      <h2 class="heading">{{ section.settings.heading }}</h2>
-    {% endif %}
+  {% unless is_home %}
+    <button class="nav prev" type="button" aria-label="Anterior">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  {% endunless %}
+  <button class="nav next" type="button" aria-label="Próximo">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
 
-    <div class="grid">
-      {% for block in blocks %}
-        {% liquid
-          assign col  = block.settings.collection
-          assign link = block.settings.link
-          if link == blank and col != blank
-            assign link = col.url
-          endif
-
-          assign title = block.settings.title
-          if title == blank and col != blank
-            assign title = col.title
-          endif
-
-          assign img = block.settings.image
-          if img == blank and col != blank and col.image
-            assign img = col.image
-          endif
-
-          assign bg = block.settings.card_bg
-        %}
-
-        <a class="card"
-           href="{{ link | default: '#' }}"
-           style="--card-bg: {{ bg | default: '#F5F7FF' }};"
-           data-bg
-           {{ block.shopify_attributes }}>
-
-          <div class="card__title">{{ title | default: 'Categoria' }}</div>
-
-          <div class="card__media" aria-hidden="true">
-            {% if img != blank %}
-              <img
-                src="{{ img | image_url: width: 520 }}"
-                alt="{{ title | escape }}"
-                loading="lazy">
-            {% else %}
-              <span style="width:90px;height:90px;border-radius:16px;background:rgba(0,0,0,.06);display:block;"></span>
-            {% endif %}
-          </div>
-
-          <span class="card__btn">{{ block.settings.button_label | default: section.settings.button_label | default: 'Ver Mais' }}</span>
-        </a>
-      {% endfor %}
+  <div class="viewport">
+    <div class="container">
+      <div class="track">
+        {%- assign _cats_menu = linklists[section.settings.menu] -%}
+        {%- for link in _cats_menu.links -%}
+          {%- assign _col = link.object -%}
+          <a class="card" href="{{ link.url }}">
+            <div class="media">
+              {%- if _col and _col.image -%}
+                <img src="{{ _col.image | image_url: width: 300 }}" alt="{{ link.title | escape }}" loading="lazy">
+              {%- elsif _col and _col.featured_image -%}
+                <img src="{{ _col.featured_image | image_url: width: 300 }}" alt="{{ link.title | escape }}" loading="lazy">
+              {%- else -%}
+                <svg viewBox="0 0 48 48" width="36" height="36" aria-hidden="true">
+                  <rect x="0" y="0" width="48" height="48" fill="#e9ebee"/>
+                </svg>
+              {%- endif -%}
+            </div>
+            <div class="title">{{ link.title }}</div>
+          </a>
+        {%- endfor -%}
+      </div>
     </div>
   </div>
+
+  <script>
+    (function(){
+      const root  = document.getElementById('royal-cats-{{ section.id }}');
+      if(!root) return;
+      const track = root.querySelector('.track');
+      const prev  = root.querySelector('.nav.prev');
+      const next  = root.querySelector('.nav.next');
+      if(!track) return;
+
+      function step(){
+        const styles = getComputedStyle(track);
+        const gap = parseFloat(styles.columnGap || styles.gap) || 12;
+        const card = track.querySelector('.card');
+        if(!card) return 300;
+        const w = card.getBoundingClientRect().width;
+        return w + gap;
+      }
+
+      function updateArrows(){
+        const maxScroll = track.scrollWidth - track.clientWidth - 1;
+        const atStart = track.scrollLeft <= 0;
+        const atEnd   = track.scrollLeft >= maxScroll;
+        if (prev) root.classList.toggle('at-start', atStart);
+        root.classList.toggle('at-end', atEnd);
+      }
+
+      function go(dir){
+        track.scrollBy({ left: step() * dir, behavior: 'smooth' });
+      }
+
+      if (prev) prev.addEventListener('click', () => go(-1));
+      if (next) next.addEventListener('click', () => go(1));
+
+      track.addEventListener('scroll', updateArrows, { passive: true });
+      window.addEventListener('resize', updateArrows);
+      updateArrows();
+
+      /* Drag horizontal CONTINUO (mobile): segue o dedo pixel a pixel sem pulo.
+         Horizontal: scrolla o track, bloqueia scroll vertical da pagina.
+         Vertical: NAO previne, deixa a pagina rolar (card nao samba). */
+      let tStartX = 0, tStartY = 0, tScrollStart = 0, tAxis = null;
+      track.addEventListener('touchstart', (e) => {
+        if (!e.touches || !e.touches.length) return;
+        tStartX = e.touches[0].clientX;
+        tStartY = e.touches[0].clientY;
+        tScrollStart = track.scrollLeft;
+        tAxis = null;
+      }, { passive: true });
+      track.addEventListener('touchmove', (e) => {
+        if (!e.touches || !e.touches.length) return;
+        const dx = e.touches[0].clientX - tStartX;
+        const dy = e.touches[0].clientY - tStartY;
+        if (tAxis === null) {
+          if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+            tAxis = 'x';
+            track.classList.add('rcd-dragging'); // desativa snap durante drag
+          } else if (Math.abs(dy) > 8) {
+            tAxis = 'y';
+          }
+        }
+        if (tAxis === 'x') {
+          track.scrollLeft = tScrollStart - dx;
+          if (e.cancelable) e.preventDefault();
+        }
+      }, { passive: false });
+      function endTouchCats(){
+        tAxis = null;
+        track.classList.remove('rcd-dragging');
+      }
+      track.addEventListener('touchend',    endTouchCats, { passive: true });
+      track.addEventListener('touchcancel', endTouchCats, { passive: true });
+    })();
+  </script>
 </section>
 
 {% schema %}
 {
-  "name": "Royal • Categorias",
+  "name": "Royal • Categoria Cards",
   "settings": [
-    { "type": "text", "id": "heading", "label": "Título da seção", "default": "Conheça Nossas Categorias" },
+    { "type": "link_list", "id": "menu", "label": "Menu de categorias", "info": "Cada item do menu vira um card. O link deve apontar para uma coleção para exibir a imagem automaticamente." },
 
-    { "type": "color", "id": "bg", "label": "Fundo da seção", "default": "#F6D8E6" },
-    { "type": "color", "id": "title_color", "label": "Cor do título", "default": "#2B2B2B" },
-    { "type": "color", "id": "text_color", "label": "Cor do texto", "default": "#2B2B2B" },
+    { "type": "checkbox", "id": "desktop_compact", "label": "Desktop: usar compacto", "default": true },
 
-    { "type": "range", "id": "card_radius", "label": "Raio do card (desktop)", "min": 16, "max": 40, "step": 1, "default": 26 },
+    { "type": "range", "id": "desktop_fit_count", "label": "Desktop: encaixar N", "min": 2, "max": 10, "step": 1, "default": 5 },
 
-    { "type": "range", "id": "desktop_cols", "label": "Colunas no desktop", "min": 2, "max": 6, "step": 1, "default": 4 },
+    { "type": "range", "id": "mobile_visible", "label": "Mobile: cards visíveis", "min": 3, "max": 6, "step": 1, "default": 5 },
 
-    { "type": "text", "id": "button_label", "label": "Texto do botão", "default": "Ver Mais" },
-    { "type": "color", "id": "btn_bg", "label": "Cor do botão", "default": "#D93B7D" },
-    { "type": "color", "id": "btn_text", "label": "Texto do botão", "default": "#FFFFFF" }
+    { "type": "header", "content": "Posição Desktop" },
+    { "type": "range", "id": "space_top_desktop", "label": "Espaço acima (px)", "min": 0, "max": 300, "step": 3, "default": 0 },
+    { "type": "range", "id": "shift_y_desktop", "label": "Ajuste Y (px)", "min": -100, "max": 100, "step": 2, "default": 0 },
+
+    { "type": "header", "content": "Posição Mobile" },
+    { "type": "range", "id": "space_top_mobile", "label": "Espaço acima (px)", "min": 0, "max": 400, "step": 4, "default": 0 },
+    { "type": "range", "id": "shift_y_mobile", "label": "Ajuste Y (px)", "min": -100, "max": 100, "step": 2, "default": 0 },
+
+    { "type": "range", "id": "media_standard_desktop", "label": "Círculo desktop", "min": 60, "max": 160, "step": 2, "default": 120 },
+    { "type": "range", "id": "media_compact_desktop", "label": "Círculo compacto", "min": 60, "max": 140, "step": 2, "default": 100 },
+    { "type": "range", "id": "media_compact_mobile", "label": "Círculo mobile", "min": 48, "max": 110, "step": 2, "default": 80 }
   ],
-  "blocks": [
-    {
-      "type": "cat",
-      "name": "Categoria",
-      "settings": [
-        { "type": "collection", "id": "collection", "label": "Coleção (opcional)" },
-        { "type": "text", "id": "title", "label": "Título (opcional)" },
-        { "type": "image_picker", "id": "image", "label": "Imagem do card (opcional)" },
-        { "type": "url", "id": "link", "label": "Link (opcional, sobrescreve coleção)" },
-
-        { "type": "text", "id": "button_label", "label": "Texto do botão (opcional)" },
-        { "type": "color", "id": "card_bg", "label": "Cor de fundo do card", "default": "#F5F7FF" }
-      ]
-    }
-  ],
-  "max_blocks": 12,
   "presets": [
-    { "name": "Royal • Categorias", "category": "Collections" }
+    { "name": "Royal • Categoria Cards", "category": "Collections" }
   ]
 }
 {% endschema %}
