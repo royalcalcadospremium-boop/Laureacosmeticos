@@ -13889,13 +13889,13 @@ input.qtyminus {
 }
 
 .span-black-discount {
-    font-family: Montserrat,sans-serif;
+    font-family: var(--ad-font-text);
     font-weight: 700;
     color: #fff;
 }
 
 .neon-black-friday {
-    font-family: Montserrat,sans-serif;
+    font-family: var(--ad-font-text);
     font-weight: 900;
     color: #fff;
     text-shadow: 0 0 1px #831d1c, 0 0 1px #831d1c, 0 0 1px #831d1c, 0 0 3px #FF2D3C, 0 0 15px #FF2D3C, 0 0 7px #FF2D3C, 0 0 20px #FF2D3C, 0 0 25px #FF2D3C;
@@ -13925,7 +13925,7 @@ input.qtyminus {
 }
 
 .blackweek-span {
-    font-family: Montserrat,sans-serif;
+    font-family: var(--ad-font-text);
     font-weight: 600;
     font-size: 10pt;
     color: #fff;

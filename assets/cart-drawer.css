@@ -13,7 +13,7 @@
   --rcd-success: #b8f35a;
   --rcd-success-text: #0a2a0c;
   --rcd-btn: #0f0f14;
-  --rcd-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  --rcd-font: system-ui, -apple-system, BlinkMacSystemFont, "Inter Variable", "Inter", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji","Segoe UI Emoji";
 }
 
 .rcd{ position: relative; z-index: 99999; font-family: var(--rcd-font); }

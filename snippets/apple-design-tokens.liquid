@@ -76,6 +76,12 @@
     --ad-font-display: system-ui, -apple-system, BlinkMacSystemFont, "Inter Variable", "Inter", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     --ad-font-text:    system-ui, -apple-system, BlinkMacSystemFont, "Inter Variable", "Inter", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
 
+    /* Force the Shopify font_picker vars used everywhere in theme.css
+       to resolve to the Apple stack. This is the highest-leverage point
+       to keep cards (home, coleção, PDP) on SF Pro / Inter Variable. */
+    --text-font-family:    var(--ad-font-text);
+    --heading-font-family: var(--ad-font-display);
+
     /* ── Typography: hero-display ──────────────────── */
     --ad-type-hero-display-size:      56px;
     --ad-type-hero-display-weight:    600;
