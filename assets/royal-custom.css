@@ -4,6 +4,86 @@
    ============================================================ */
 
 /* ----------------------------------------------------------
+   PRODUCT IMAGE SQUARE NORMALIZATION
+   Força todas as imagens de produto (home, coleção, busca,
+   recomendações) a renderizarem em 1:1 com object-fit: cover.
+   Retangulares são recortadas pra preencher o quadrado.
+   ---------------------------------------------------------- */
+
+/* Modern Royal Calçados card path */
+.rc-card .rc-media,
+a.rc-media,
+.rc-media {
+  aspect-ratio: 1 / 1 !important;
+  position: relative;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+}
+.rc-card .rc-media img,
+.rc-media > img,
+.rc-media-swap .rc-img-primary,
+.rc-media-swap .rc-img-secondary {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* Legacy product-item.liquid (collection-*.liquid sections) */
+.product-item .product-item__image-wrapper {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  display: block;
+}
+.product-item .product-item__image-wrapper .aspect-ratio {
+  padding-bottom: 100% !important;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  overflow: hidden;
+}
+.product-item__primary-image,
+.product-item__secondary-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* Product recommendations carousel cards (nb-rec-card) */
+.nb-rec-card__img-wrap {
+  aspect-ratio: 1 / 1 !important;
+  position: relative;
+  overflow: hidden;
+}
+.nb-rec-card__img-wrap img,
+.nb-rec-card .rc-media-swap .rc-img-primary,
+.nb-rec-card .rc-media-swap .rc-img-secondary {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* Quickbuy thumbnail and any .imgwrap used by Royal sections */
+.imgwrap,
+.tabs-cards .imgwrap {
+  aspect-ratio: 1 / 1 !important;
+  position: relative;
+  overflow: hidden;
+}
+.imgwrap > img,
+.imgwrap .rc-media-swap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+
+/* ----------------------------------------------------------
    1. ANNOUNCEMENT BAR — 3 modalidades
    ---------------------------------------------------------- */
 .announcement-bar--modalities .announcement-bar__inner {
