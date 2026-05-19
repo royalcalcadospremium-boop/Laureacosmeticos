@@ -69,10 +69,12 @@
     
     {% render 'social-meta-tags' %}
     {% render 'css-variables' %}
+    {% render 'apple-design-tokens' %}
 
     {{ content_for_header }}
     <link rel="stylesheet" href="{{ 'theme.css' | asset_url }}">
     <link rel="stylesheet" href="{{ 'royal-custom.css' | asset_url }}">
+    <link rel="stylesheet" href="{{ 'apple-foundation.css' | asset_url }}">
 
     {% render 'microdata-schema' %}
     {% render 'fk-lck' %}
@@ -387,7 +389,13 @@
 })();
 </script>
 
-{% section 'cart-drawer' %}
+{%- comment -%}
+  cart-drawer section JÁ é renderizado em linha 319 acima.
+  Removido render duplicado aqui (estava causando 2 drawers no DOM,
+  IDs duplicados, listeners duplicados, race conditions).
+  Os asset_url CSS + JS continuam (sem duplicação) — eles são
+  recursos auxiliares legados, não dependem do section.
+{%- endcomment -%}
 {{ 'cart-drawer.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
 

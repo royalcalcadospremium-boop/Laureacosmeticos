@@ -249,6 +249,22 @@ async function setMetafieldsBatch(metafields) {
   return data.metafieldsSet.metafields.length;
 }
 
+async function tagSyncedOlist(productGid) {
+  // Adiciona tag 'synced-olist' no produto. Idempotente — Shopify dedupe tags.
+  // Marca o produto como "vinculado ao ERP Tiny/Olist" pra o carrinho saber se
+  // pode mandar pro checkout direto (Yampi) ou se precisa ir pra vendedora.
+  const data = await shopifyGraphQL(
+    `mutation tagsAdd($id: ID!, $tags: [String!]!) {
+       tagsAdd(id: $id, tags: $tags) {
+         userErrors { field message }
+       }
+     }`,
+    { id: productGid, tags: ['synced-olist'] }
+  );
+  const errs = data.tagsAdd.userErrors;
+  if (errs && errs.length) throw new Error('tagsAdd: ' + JSON.stringify(errs));
+}
+
 // ---------- main ----------
 function pickVarejoPrice(item) {
   const sku = (item.sku || item.codigo || '').trim();
@@ -281,6 +297,23 @@ async function run() {
   const skuAtacadoUsed = new Map(); // sku → atacado (pra debug)
   let total = 0, skipped = 0, missing = 0, missingAtacado = 0;
 
+  // Helper: extrai peso do Olist em GRAMAS (Shopify usa GRAMS por padrão).
+  // Olist pode retornar pesoBruto/pesoLiquido em "kg" (decimal, ex: "0,250")
+  // OU em "g" (inteiro, ex: "250"). Detecta heuristicamente:
+  //   - valor < 10  → assume kg → multiplica por 1000
+  //   - valor >= 10 → assume já está em gramas (não multiplica)
+  // Isso evita o bug onde "250" (gramas) virava 250.000g = 250kg por unidade.
+  // Sanity cap: peso > 50.000 g (50kg) por unidade é descartado (provável dado corrompido).
+  function pickPesoG(item) {
+    const raw = item.pesoBruto ?? item.pesoLiquido ?? item.peso ?? null;
+    if (raw === null || raw === undefined || raw === '') return null;
+    const v = Number(String(raw).replace(',', '.'));
+    if (!isFinite(v) || v <= 0) return null;
+    const grams = v < 10 ? Math.round(v * 1000) : Math.round(v);
+    if (grams > 50000) return null; // descarta outliers (> 50kg por unidade)
+    return grams;
+  }
+
   for await (const item of iterateOlistProducts()) {
     total++;
     const { sku, value: varejo } = pickVarejoPrice(item);
@@ -295,6 +328,8 @@ async function run() {
       // Se não tem atacado, ainda atualiza varejo no variant.price
     }
 
+    const pesoG = pickPesoG(item);
+
     let entry = productQueue.get(hit.productGid);
     if (!entry) {
       entry = {
@@ -306,7 +341,7 @@ async function run() {
     }
     // Adiciona variante (se ainda não tiver)
     if (!entry.variants.find(v => v.variantGid === hit.variantGid)) {
-      entry.variants.push({ variantGid: hit.variantGid, varejo, sku });
+      entry.variants.push({ variantGid: hit.variantGid, varejo, sku, pesoG });
     }
     if (atacado && !entry.atacadoValue) entry.atacadoValue = atacado;
     if (atacado) skuAtacadoUsed.set(sku, atacado);
@@ -333,16 +368,27 @@ async function run() {
     return;
   }
 
-  // Fase 3A: bulk update variant prices (varejo no .price)
-  console.log(`\nAtualizando variant.price em ${productQueue.size} produtos...`);
+  // Fase 3A: bulk update variant prices (varejo no .price) + peso (inventoryItem.measurement)
+  console.log(`\nAtualizando variant.price + peso em ${productQueue.size} produtos...`);
   let pricesWritten = 0, pricesFailed = 0;
+  let weightsWritten = 0;
   const productsArr = Array.from(productQueue.entries());
   for (let i = 0; i < productsArr.length; i++) {
     const [productGid, info] = productsArr[i];
-    const variantsInput = info.variants.map(v => ({
-      id: v.variantGid,
-      price: v.varejo.toFixed(2)
-    }));
+    const variantsInput = info.variants.map(v => {
+      const inp = {
+        id: v.variantGid,
+        price: v.varejo.toFixed(2)
+      };
+      // Só grava peso se Olist retornou valor > 0 (não sobrescreve com 0)
+      if (v.pesoG && v.pesoG > 0) {
+        inp.inventoryItem = {
+          measurement: { weight: { value: v.pesoG, unit: 'GRAMS' } }
+        };
+        weightsWritten++;
+      }
+      return inp;
+    });
     try {
       await bulkUpdateVariantPrices(productGid, variantsInput);
       pricesWritten += variantsInput.length;
@@ -382,10 +428,32 @@ async function run() {
     await new Promise(r => setTimeout(r, 100));
   }
 
+  // Fase 3C: tag 'synced-olist' em cada produto atualizado
+  // (carrinho usa essa tag pra decidir: checkout direto vs modal vendedora)
+  console.log(`\nAdicionando tag 'synced-olist' em ${productsArr.length} produtos...`);
+  let tagsWritten = 0, tagsFailed = 0;
+  for (let i = 0; i < productsArr.length; i++) {
+    const [productGid] = productsArr[i];
+    try {
+      await tagSyncedOlist(productGid);
+      tagsWritten++;
+    } catch (err) {
+      tagsFailed++;
+      if (tagsFailed < 5) console.error(`  ✗ tag ${productGid}: ${err.message}`);
+    }
+    if (i % 20 === 19) {
+      console.log(`  ${i + 1}/${productsArr.length} produtos taggeados`);
+      await new Promise(r => setTimeout(r, 200));
+    }
+  }
+  console.log(`Tags 'synced-olist': ${tagsWritten} sucesso (${tagsFailed} falhas)\n`);
+
   console.log(`\nResumo final:`);
   console.log(`  Produtos lidos no Olist:       ${total}`);
   console.log(`  variant.price atualizados:     ${pricesWritten}`);
   console.log(`  metafield preço atacado:       ${mfWritten}`);
+  console.log(`  Tag 'synced-olist' aplicada:   ${tagsWritten}`);
+  console.log(`  Peso (em gramas) gravado:      ${weightsWritten}`);
   console.log(`  Falhas (prices):               ${pricesFailed}`);
   console.log(`  Falhas (metafields):           ${mfFailed}`);
 }

@@ -1,0 +1,68 @@
+name: Sync preço de varejo (Olist → Shopify)
+
+on:
+  schedule:
+    # Todo dia às 04:00 BRT (07:00 UTC)
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Simular sem gravar (1 = dry-run, 0 = executar)'
+        required: false
+        default: '0'
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Montar sync/.env
+        working-directory: sync
+        env:
+          TINY_CLIENT_ID: ${{ secrets.TINY_CLIENT_ID }}
+          TINY_CLIENT_SECRET: ${{ secrets.TINY_CLIENT_SECRET }}
+          TINY_REFRESH_TOKEN: ${{ secrets.TINY_REFRESH_TOKEN }}
+          SHOPIFY_STORE_DOMAIN: ${{ secrets.SHOPIFY_STORE_DOMAIN }}
+          SHOPIFY_ADMIN_TOKEN: ${{ secrets.SHOPIFY_ADMIN_TOKEN }}
+        run: |
+          cat > .env <<EOF
+          TINY_CLIENT_ID=$TINY_CLIENT_ID
+          TINY_CLIENT_SECRET=$TINY_CLIENT_SECRET
+          TINY_REFRESH_TOKEN=$TINY_REFRESH_TOKEN
+          TINY_REDIRECT_URI=http://localhost:3000/oauth/callback
+          SHOPIFY_STORE_DOMAIN=$SHOPIFY_STORE_DOMAIN
+          SHOPIFY_ADMIN_TOKEN=$SHOPIFY_ADMIN_TOKEN
+          SHOPIFY_METAFIELD_NAMESPACE=custom
+          SHOPIFY_METAFIELD_KEY=preco_varejo
+          OLIST_USE_PROMO_PRICE=1
+          EOF
+
+      - name: Rodar sync
+        working-directory: sync
+        env:
+          DRY_RUN: ${{ inputs.dry_run || '0' }}
+        run: node sync-precos.js
+
+      - name: Rotacionar TINY_REFRESH_TOKEN se mudou (opcional — requer secret GH_PAT)
+        if: success() && env.GH_TOKEN != ''
+        continue-on-error: true
+        working-directory: sync
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          # O Olist rotaciona refresh_token a cada renovação. Atualiza o secret se necessário.
+          # Requer Personal Access Token com escopo `repo` ou `actions:write` no secret GH_PAT.
+          NEW=$(grep '^TINY_REFRESH_TOKEN=' .env | cut -d'=' -f2-)
+          if [ -n "$NEW" ] && [ "$NEW" != "${{ secrets.TINY_REFRESH_TOKEN }}" ]; then
+            echo "Refresh token rotacionado — atualizando secret"
+            echo -n "$NEW" | gh secret set TINY_REFRESH_TOKEN --repo "${{ github.repository }}" || echo "Falhou ao atualizar secret (provavelmente sem permissao)"
+          fi

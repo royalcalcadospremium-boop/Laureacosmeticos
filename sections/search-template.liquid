@@ -1,14 +1,14 @@
 {% comment %}
-Royal • Search Template — idêntico ao Collection Gummy Style (v1.0)
+Royal • Search Gummy Style (v1.0.0)
+- Espelha collection-template.liquid: mesma rc-grid, mesmo rc-product-card,
+  mesmo seletor de tier, mesmo Quick Buy modal.
+- Sem filtros de marca/modelo/tamanho (resultados de busca são heterogêneos).
+- Sem botão "Baixar fotos" (download é por coleção, não por busca).
+- Resultados não-produto (pages, articles) aparecem em lista compacta no fim.
 {% endcomment %}
 
-{%- assign items_per_page = 48 -%}
-
+{%- assign items_per_page = section.settings.products_per_page | default: 24 -%}
 {%- render 'rc-tier-card-assets' -%}
-
-{%- assign quick_links_menu = linklists[section.settings.quick_links] -%}
-{%- assign has_filters = false -%}
-{%- if quick_links_menu.links.size > 0 -%}{%- assign has_filters = true -%}{%- endif -%}
 
 <section id="royal-search-gummy-{{ section.id }}" class="royal-section-fix" data-section-id="{{ section.id }}" data-section-type="search">
 
@@ -31,32 +31,41 @@ Royal • Search Template — idêntico ao Collection Gummy Style (v1.0)
 
     #royal-search-gummy-{{ section.id }} .rc-container{ max-width: 1320px; margin: 0 auto; padding: 0 16px; width: 100%; }
     #royal-search-gummy-{{ section.id }} .rc-title{ color: var(--primary); font-weight: 700; font-size: clamp(22px, 3vw, 36px); margin: 10px 0; }
+    #royal-search-gummy-{{ section.id }} .rc-subtitle{ color: #666; font-size: 14px; margin: 0 0 16px; }
 
-    #royal-search-gummy-{{ section.id }} .rc-layout{
-      display: grid;
-      grid-template-columns: {% if has_filters %}260px 1fr{% else %}1fr{% endif %};
-      gap: 24px;
-      align-items: start;
+    /* SEARCH FORM */
+    #royal-search-gummy-{{ section.id }} .rc-search-form{
+      display: flex; gap: 8px; max-width: 560px; margin: 0 0 24px;
     }
+    #royal-search-gummy-{{ section.id }} .rc-search-input{
+      flex: 1; height: 44px; padding: 10px 18px;
+      border: 1px solid #e0e0e0; border-radius: 9999px;
+      font-size: 15px; font-family: inherit; color: var(--text); background: #fff;
+    }
+    #royal-search-gummy-{{ section.id }} .rc-search-input:focus{
+      outline: 2px solid #0066cc; outline-offset: 1px; border-color: #0066cc;
+    }
+    #royal-search-gummy-{{ section.id }} .rc-search-btn{
+      height: 44px; padding: 0 24px; background: #111; color: #fff;
+      border: 0; border-radius: 9999px; font-weight: 700; cursor: pointer;
+      font-size: 14px;
+    }
+    #royal-search-gummy-{{ section.id }} .rc-search-btn:hover{ opacity: 0.9; }
 
-    /* GRID CORE */
+    /* GRID CORE (idêntico à collection) */
     #royal-search-gummy-{{ section.id }} .rc-grid{
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 20px;
       width: 100%;
     }
-
     @media (max-width: 1100px){ #royal-search-gummy-{{ section.id }} .rc-grid{ grid-template-columns: repeat(3, 1fr); } }
-
-    @media (max-width: 800px){
-      #royal-search-gummy-{{ section.id }} .rc-layout{ grid-template-columns: 1fr; }
-      #royal-search-gummy-{{ section.id }} .rc-sidebar{ display:none; }
+    @media (max-width: 767px){
       #royal-search-gummy-{{ section.id }} .rc-grid{ grid-template-columns: repeat(2, 1fr); gap: 10px; }
       #royal-search-gummy-{{ section.id }} .rc-container{ padding: 0 10px; }
     }
 
-    /* CARDS */
+    /* CARDS (idêntico à collection) */
     #royal-search-gummy-{{ section.id }} .rc-card{
       background: var(--card);
       border-radius: var(--radius);
@@ -67,587 +76,301 @@ Royal • Search Template — idêntico ao Collection Gummy Style (v1.0)
       border: 1px solid #f0f0f0;
       transition: transform 0.2s ease;
     }
-
     #royal-search-gummy-{{ section.id }} .rc-media{
       display: block; width: 100%; aspect-ratio: 1/1; position: relative; background: #f9f9f9;
     }
     #royal-search-gummy-{{ section.id }} .rc-media img{
       position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
     }
-
     #royal-search-gummy-{{ section.id }} .rc-name{
       font-size: 13px; font-weight: 600; color: var(--text); text-decoration: none;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
       height: 34px; margin: 8px 0 4px; line-height: 1.3;
     }
-
     #royal-search-gummy-{{ section.id }} .rc-price-value{ font-size: 15px; font-weight: 800; color: #111; }
 
     #royal-search-gummy-{{ section.id }} .rc-badge{
       position: absolute; top: 8px; left: 8px; background: var(--badge-bg); opacity: var(--badge-opacity); color: #fff;
       border-radius: 2px; font-size: 10px; font-weight: 700; padding: 3px 6px; z-index: 2;
     }
-
     .nb-bag {
       position: absolute; bottom: 8px; right: 8px; background: #fff; border: none;
       border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; z-index: 3;
     }
 
-    /* DOWNLOAD AREA */
-    .rc-pagination-wrapper { margin-top: 40px; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }
-    .rc-zip-btn {
-      background: #111; color: #fff; border: none; padding: 14px 28px; border-radius: 4px;
-      font-weight: 700; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;
+    /* OUTROS RESULTADOS (pages, articles) */
+    #royal-search-gummy-{{ section.id }} .rc-other-results{
+      margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;
     }
-    .rc-zip-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    #zip-status { font-size: 12px; font-weight: 600; color: #555; margin-top: 10px; }
+    #royal-search-gummy-{{ section.id }} .rc-other-results h2{
+      font-size: 18px; font-weight: 700; margin: 0 0 16px; color: var(--primary);
+    }
+    #royal-search-gummy-{{ section.id }} .rc-other-list{
+      list-style: none; margin: 0; padding: 0;
+    }
+    #royal-search-gummy-{{ section.id }} .rc-other-list li{
+      padding: 12px 0; border-bottom: 1px solid #f5f5f5;
+    }
+    #royal-search-gummy-{{ section.id }} .rc-other-list a{
+      color: #0066cc; text-decoration: none; font-size: 15px; font-weight: 600;
+    }
+    #royal-search-gummy-{{ section.id }} .rc-other-list a:hover{ text-decoration: underline; }
+    #royal-search-gummy-{{ section.id }} .rc-other-list .rc-other-snippet{
+      color: #666; font-size: 13px; margin-top: 4px; line-height: 1.4;
+    }
 
-    /* PAGINAÇÃO */
-    .rc-pagination { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
-    .rc-page {
+    /* PAGINAÇÃO (idêntico à collection) */
+    #royal-search-gummy-{{ section.id }} .rc-pagination-wrapper { margin-top: 40px; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }
+    #royal-search-gummy-{{ section.id }} .rc-pagination { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    #royal-search-gummy-{{ section.id }} .rc-page {
       min-width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
       border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #111; font-weight: 600; font-size: 13px;
     }
-    .rc-page[aria-current="page"] { background: #111; color: #fff; border-color: #111; }
+    #royal-search-gummy-{{ section.id }} .rc-page[aria-current="page"] { background: #111; color: #fff; border-color: #111; }
 
-    /* MODAL QUICK BUY */
+    /* EMPTY / INITIAL STATES */
+    #royal-search-gummy-{{ section.id }} .rc-empty{
+      text-align: center; padding: 60px 20px; background: #fafafa; border-radius: 12px; margin-top: 24px;
+    }
+    #royal-search-gummy-{{ section.id }} .rc-empty h2{ font-size: 22px; font-weight: 700; margin: 0 0 8px; color: var(--primary); }
+    #royal-search-gummy-{{ section.id }} .rc-empty p{ color: #666; margin: 0 0 20px; }
+    #royal-search-gummy-{{ section.id }} .rc-empty-cta{
+      display: inline-block; padding: 12px 24px; background: #111; color: #fff;
+      text-decoration: none; border-radius: 9999px; font-weight: 700; font-size: 14px;
+    }
+
+    /* MODAL QUICK BUY (idêntico à collection) */
     .nb-qb-wrap { position: fixed; inset: 0; z-index: 999999; display: none; align-items: flex-end; justify-content: center; background: rgba(0,0,0,0.5); }
     .nb-qb-wrap.nb-open { display: flex; }
     .nb-qb-modal { background: #fff; width: 100%; max-width: 500px; border-radius: 16px 16px 0 0; padding: 20px; position: relative; }
-
-    /* FILTER DRAWER */
-    .rc-filter-icon {
-      position: absolute; top: 0; right: 0; width: 48px; height: 48px;
-      background: #111; color: #fff; border: none; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-      z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transition: background 0.2s ease;
-    }
-    .rc-filter-icon.is-floating { position: fixed; top: 20px; right: 20px; }
-    .rc-filter-icon:hover { background: #333; }
-    .rc-filter-icon .rc-filter-badge {
-      display: none; position: absolute; top: -4px; right: -4px;
-      background: #111; color: #fff; border: 2px solid #fff;
-      border-radius: 50%; width: 18px; height: 18px;
-      font-size: 10px; font-weight: 800; line-height: 1;
-      align-items: center; justify-content: center;
-    }
-    .rc-filter-icon.has-filters .rc-filter-badge { display: flex; }
-
-    .rc-filter-drawer {
-      position: fixed; left: 0; top: 0; width: 100%; max-width: 360px; height: 100vh;
-      background: #fff; z-index: 9999; overflow-y: auto; transform: translateX(-100%);
-      transition: transform 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-    }
-    .rc-filter-drawer.is-open { transform: translateX(0); }
-    .rc-filter-drawer-overlay {
-      position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,0.5);
-      display: none;
-    }
-    .rc-filter-drawer.is-open ~ .rc-filter-drawer-overlay { display: block; }
-
-    .rc-filter-header {
-      padding: 16px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;
-    }
-    .rc-filter-title { font-weight: 800; font-size: 16px; }
-    .rc-filter-close { background: none; border: none; font-size: 24px; cursor: pointer; }
-
-    .rc-filter-section { border-bottom: 1px solid #f0f0f0; padding: 14px 16px 16px; }
-    .rc-filter-section-title {
-      font-weight: 800; font-size: 11px; letter-spacing: 0.8px;
-      color: #777; text-transform: uppercase; margin-bottom: 12px;
-    }
-
-    .rc-filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-
-    .rc-filter-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 7px 14px; border: 1.5px solid #ddd; border-radius: 20px;
-      cursor: pointer; font-size: 13px; font-weight: 600; color: #333;
-      background: #fff; transition: background 0.15s, border-color 0.15s, color 0.15s;
-      user-select: none;
-    }
-    .rc-filter-chip input[type="checkbox"] { display: none; }
-    .rc-filter-chip:has(input:checked) { background: #111; border-color: #111; color: #fff; }
-    .rc-filter-empty { font-size: 12px; color: #aaa; font-style: italic; margin: 0; }
-
-    .rc-filter-actions {
-      padding: 16px; display: flex; gap: 8px; border-top: 1px solid #eee;
-      position: sticky; bottom: 0; background: #fff;
-    }
-    .rc-filter-reset, .rc-filter-apply {
-      flex: 1; padding: 12px; border-radius: 4px; border: none; font-weight: 700; font-size: 13px; cursor: pointer;
-    }
-    .rc-filter-reset { background: #f0f0f0; color: #111; }
-    .rc-filter-apply { background: #111; color: #fff; }
-
-    /* ESTADO VAZIO */
-    #royal-search-gummy-{{ section.id }} .rc-empty {
-      text-align: center; padding: 60px 20px;
-    }
-    #royal-search-gummy-{{ section.id }} .rc-empty h1 {
-      font-size: clamp(22px, 3vw, 32px); font-weight: 800; color: #111; margin-bottom: 12px;
-    }
-    #royal-search-gummy-{{ section.id }} .rc-empty p {
-      color: #666; font-size: 15px; margin-bottom: 28px;
-    }
-    #royal-search-gummy-{{ section.id }} .rc-search-form {
-      display: flex; max-width: 480px; margin: 0 auto; border: 2px solid #111; border-radius: 4px; overflow: hidden;
-    }
-    #royal-search-gummy-{{ section.id }} .rc-search-form input {
-      flex: 1; padding: 14px 16px; border: none; outline: none; font-size: 15px;
-    }
-    #royal-search-gummy-{{ section.id }} .rc-search-form button {
-      padding: 14px 20px; background: #111; color: #fff; border: none; cursor: pointer; font-weight: 700;
-    }
+    .qb-close { position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 24px; cursor: pointer; line-height: 1; }
+    .qb-header { display: flex; gap: 15px; align-items: center; margin-bottom: 20px; }
+    .qb-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
+    .qb-title { margin: 0; font-size: 14px; }
+    .qb-price { font-weight: 800; font-size: 16px; }
+    .qb-label { font-size: 12px; font-weight: 800; margin-bottom: 10px; }
+    .qb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+    .sz-btn { padding: 12px; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer; font-weight: 700; transition: border-color 0.15s ease; }
+    .sz-btn.is-selected { border-color: #111; }
+    .sz-btn.is-unavailable, .sz-btn[disabled] { background: #f5f5f5; opacity: 0.4; cursor: not-allowed; }
+    .qb-add { width: 100%; padding: 16px; background: #111; color: #fff; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; opacity: 0.5; transition: opacity 0.15s ease; }
+    .qb-add.is-ready, .qb-add:not([disabled]) { opacity: 1; }
   </style>
 
-  {%- if search.performed -%}
-    {%- if search.results_count == 0 -%}
+  <div class="rc-container">
+    {%- if search.performed -%}
+      {%- assign product_count = 0 -%}
+      {%- assign other_count = 0 -%}
+      {%- for r in search.results -%}
+        {%- if r.object_type == 'product' -%}{%- assign product_count = product_count | plus: 1 -%}
+        {%- else -%}{%- assign other_count = other_count | plus: 1 -%}{%- endif -%}
+      {%- endfor -%}
 
-      <div class="rc-container">
+      <h1 class="rc-title">{{ search.terms | escape }}</h1>
+      <p class="rc-subtitle">{{ search.results_count }} {% if search.results_count == 1 %}resultado{% else %}resultados{% endif %}</p>
+
+      <form class="rc-search-form" action="{{ routes.search_url }}" method="get" role="search">
+        <input type="hidden" name="type" value="product">
+        <input type="search" name="q" class="rc-search-input" value="{{ search.terms | escape }}" placeholder="Buscar produtos…" autocomplete="off" aria-label="Buscar">
+        <button type="submit" class="rc-search-btn">Buscar</button>
+      </form>
+
+      {%- if search.results_count == 0 -%}
         <div class="rc-empty">
-          <h1>Nenhum resultado para &ldquo;{{ search.terms }}&rdquo;</h1>
-          <p>Tente outro termo de busca.</p>
-          <form class="rc-search-form" action="{{ routes.search_url }}" method="get">
-            <input type="hidden" name="type" value="product">
-            <input type="text" name="q" placeholder="Buscar produtos..." autocomplete="off">
-            <button type="submit">Buscar</button>
-          </form>
+          <h2>Nenhum resultado para "{{ search.terms | escape }}"</h2>
+          <p>Tente outros termos ou navegue por todas as marcas.</p>
+          <a href="{{ routes.all_products_collection_url }}" class="rc-empty-cta">Ver todos os produtos</a>
         </div>
-      </div>
+      {%- else -%}
 
-    {%- else -%}
-      {%- paginate search.results by items_per_page -%}
+        {%- paginate search.results by items_per_page -%}
 
-        <div class="rc-container">
-
-          <div style="position: relative; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-            <h1 class="rc-title" style="margin: 10px 0; margin-right: 60px;">
-              Resultados para: &ldquo;{{ search.terms }}&rdquo;
-            </h1>
-            <button class="rc-filter-icon" id="btn-filter-toggle-{{ section.id }}" title="Filtros">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-              </svg>
-              <span class="rc-filter-badge" id="rc-filter-badge-{{ section.id }}">0</span>
-            </button>
-          </div>
-
-          <!-- FILTER DRAWER -->
-          <div class="rc-filter-drawer" id="filter-drawer-{{ section.id }}">
-            <div class="rc-filter-header">
-              <div class="rc-filter-title">Filtros</div>
-              <button class="rc-filter-close" onclick="document.getElementById('filter-drawer-{{ section.id }}').classList.remove('is-open');">✕</button>
-            </div>
-
-            <div class="rc-filter-section">
-              <div class="rc-filter-section-title">Tamanho</div>
-              <div class="rc-filter-chips" id="sizes-filter-{{ section.id }}"></div>
-            </div>
-
-            <div class="rc-filter-section">
-              <div class="rc-filter-section-title">Marca</div>
-              <div class="rc-filter-chips" id="marcas-filter-{{ section.id }}"></div>
-            </div>
-
-            <div class="rc-filter-actions">
-              <button class="rc-filter-reset" onclick="resetFilters_{{ section.id }}();">Limpar</button>
-              <button class="rc-filter-apply" onclick="applyFilters_{{ section.id }}();">Aplicar</button>
-            </div>
-          </div>
-          <div class="rc-filter-drawer-overlay" onclick="document.getElementById('filter-drawer-{{ section.id }}').classList.remove('is-open');"></div>
-
-          <div class="rc-layout">
-            {%- if has_filters -%}
-            <aside class="rc-sidebar">
-              <div style="font-weight: 800; font-size: 12px; margin-bottom: 15px; border-bottom: 2px solid #111; padding-bottom: 5px;">CATEGORIAS</div>
-              {%- for link in quick_links_menu.links -%}
-                <a href="{{ link.url }}" style="display: block; padding: 10px 0; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #f5f5f5;">{{ link.title }}</a>
+          {%- if product_count > 0 -%}
+            <div class="rc-grid">
+              {%- for r in search.results -%}
+                {%- if r.object_type == 'product' -%}
+                  {%- unless r.available -%}{%- continue -%}{%- endunless -%}
+                  {%- assign product = r -%}
+                  {%- render 'rc-product-card', product: product, product_index: forloop.index -%}
+                {%- endif -%}
               {%- endfor -%}
-            </aside>
-            {%- endif -%}
+            </div>
+          {%- endif -%}
 
-            <main>
-              <div class="rc-grid">
-                {%- for item in search.results -%}
-                  {%- if item.object_type == 'product' -%}
-                    {%- assign product = item -%}
-                    {%- unless product.available -%}{%- continue -%}{%- endunless -%}
-                    {%- render 'rc-product-card', product: product -%}
+          {%- if other_count > 0 -%}
+            <section class="rc-other-results">
+              <h2>Outras páginas ({{ other_count }})</h2>
+              <ul class="rc-other-list">
+                {%- for r in search.results -%}
+                  {%- if r.object_type != 'product' -%}
+                    <li>
+                      <a href="{{ r.url }}">{{ r.title | escape }}</a>
+                      {%- if r.content != blank -%}
+                        <div class="rc-other-snippet">{{ r.content | strip_html | truncate: 160 }}</div>
+                      {%- endif -%}
+                    </li>
                   {%- endif -%}
                 {%- endfor -%}
-              </div>
+              </ul>
+            </section>
+          {%- endif -%}
 
-              <div class="rc-pagination-wrapper">
-                {%- if paginate.pages > 1 -%}
-                  <nav class="rc-pagination">
-                    {%- for part in paginate.parts -%}
-                      {%- if part.is_link -%}<a href="{{ part.url }}" class="rc-page">{{ part.title }}</a>
-                      {%- else -%}<span class="rc-page" {% if part.title == paginate.current_page %}aria-current="page"{% endif %}>{{ part.title }}</span>
-                      {%- endif -%}
-                    {%- endfor -%}
-                  </nav>
-                {%- endif -%}
+          {%- if paginate.pages > 1 -%}
+            <div class="rc-pagination-wrapper">
+              <nav class="rc-pagination" aria-label="Paginação">
+                {%- for part in paginate.parts -%}
+                  {%- if part.is_link -%}<a href="{{ part.url }}" class="rc-page">{{ part.title }}</a>
+                  {%- else -%}<span class="rc-page" {% if part.title == paginate.current_page %}aria-current="page"{% endif %}>{{ part.title }}</span>
+                  {%- endif -%}
+                {%- endfor -%}
+              </nav>
+            </div>
+          {%- endif -%}
 
-                <button type="button" class="rc-zip-btn" id="btn-download-all-{{ section.id }}">Baixar fotos + numerações</button>
-                <p id="zip-status-{{ section.id }}"></p>
-              </div>
-            </main>
-          </div>
+        {%- endpaginate -%}
 
-        </div>
+      {%- endif -%}
 
-      {%- endpaginate -%}
-    {%- endif -%}
+    {%- else -%}
+      {%- comment -%} INITIAL STATE — busca não foi feita ainda {%- endcomment -%}
+      <h1 class="rc-title">Buscar</h1>
+      <p class="rc-subtitle">Encontre produtos por marca, modelo ou referência.</p>
 
-  {%- else -%}
+      <form class="rc-search-form" action="{{ routes.search_url }}" method="get" role="search">
+        <input type="hidden" name="type" value="product">
+        <input type="search" name="q" class="rc-search-input" placeholder="Buscar produtos…" autocomplete="off" autofocus aria-label="Buscar">
+        <button type="submit" class="rc-search-btn">Buscar</button>
+      </form>
 
-    <div class="rc-container">
       <div class="rc-empty">
-        <h1>Buscar produtos</h1>
-        <p>Digite o nome do produto que procura.</p>
-        <form class="rc-search-form" action="{{ routes.search_url }}" method="get">
-          <input type="hidden" name="type" value="product">
-          <input type="text" name="q" placeholder="Buscar produtos..." autocomplete="off">
-          <button type="submit">Buscar</button>
-        </form>
+        <h2>Digite o que você procura acima</h2>
+        <p>Você pode buscar por marca (Nike, Adidas, Puma), modelo (Air Max, Mizuno) ou referência.</p>
+        <a href="{{ routes.all_products_collection_url }}" class="rc-empty-cta">Ver todos os produtos</a>
       </div>
-    </div>
+    {%- endif -%}
+  </div>
 
-  {%- endif -%}
-
-  <!-- Modal Quick Buy -->
-  <div class="nb-qb-wrap" id="modal-quick-buy-{{ section.id }}" onclick="if(event.target==this) closeQuickBuy_{{ section.id }}()">
-    <div class="nb-qb-modal" id="modal-content-{{ section.id }}"></div>
+  {% comment %} Modal Quick Buy {% endcomment %}
+  <div class="nb-qb-wrap" id="modal-quick-buy" onclick="if(event.target==this) closeQuickBuy()">
+    <div class="nb-qb-modal" id="modal-content"></div>
   </div>
 
   <script>
     (function() {
-      var SID = '{{ section.id }}';
-      var root = document.getElementById('royal-search-gummy-' + SID);
-      if (!root) return;
+      // Quick Buy só é definido se ainda não existir (evita conflito com collection-template)
+      if (window.openQuickBuy) return;
 
-      // ── DADOS DOS PRODUTOS ────────────────────────────────────────────
-      var allProducts = [];
-      root.querySelectorAll('script[type="application/json"][id^="data-"]').forEach(function(el) {
-        try { allProducts.push(JSON.parse(el.textContent)); } catch(e) {}
-      });
-
-      // ── COLETAR TAMANHOS E MARCAS ─────────────────────────────────────
-      var allSizes   = new Set();
-      var allVendors = new Set();
-
-      allProducts.forEach(function(product) {
-        (product.variants || []).forEach(function(v) {
-          if (v.available && v.title && v.title !== 'Default Title') {
-            var sizeOnly = v.title.split(' / ')[0].trim();
-            if (sizeOnly) allSizes.add(sizeOnly);
-          }
-        });
-        if (product.vendor) allVendors.add(product.vendor.trim());
-      });
-
-      // ── RENDER FILTROS ────────────────────────────────────────────────
-      function chip(value, cls) {
-        return '<label class="rc-filter-chip"><input type="checkbox" class="' + cls + '" value="' + value.replace(/"/g,'&quot;') + '"><span>' + value + '</span></label>';
-      }
-
-      function renderFilters() {
-        var sortedSizes = Array.from(allSizes).sort(function(a, b) {
-          var na = parseFloat(a), nb = parseFloat(b);
-          return (!isNaN(na) && !isNaN(nb)) ? na - nb : a.localeCompare(b);
-        });
-        var sizesEl = document.getElementById('sizes-filter-' + SID);
-        if (sizesEl) sizesEl.innerHTML = sortedSizes.map(function(s){ return chip(s, 'size-filter'); }).join('') || '<p class="rc-filter-empty">Nenhum tamanho disponível</p>';
-
-        var marcasEl = document.getElementById('marcas-filter-' + SID);
-        if (marcasEl) {
-          var sortedVendors = Array.from(allVendors).sort();
-          marcasEl.innerHTML = sortedVendors.map(function(v){ return chip(v, 'marca-filter'); }).join('') || '<p class="rc-filter-empty">Nenhuma marca disponível</p>';
-        }
-      }
-
-      // ── FILTRAR CARDS ─────────────────────────────────────────────────
-      function doFilterCards() {
-        var selectedSizes  = Array.from(root.querySelectorAll('.size-filter:checked')).map(function(el){ return el.value; });
-        var selectedMarcas = Array.from(root.querySelectorAll('.marca-filter:checked')).map(function(el){ return el.value.toLowerCase(); });
-
-        root.querySelectorAll('.rc-card').forEach(function(card) {
-          var dataEl = card.querySelector('script[type="application/json"]');
-          if (!dataEl) return;
-          try {
-            var data   = JSON.parse(dataEl.textContent);
-            var vendor = (data.vendor || '').toLowerCase();
-            var hasSizeMatch  = selectedSizes.length === 0 ||
-              (data.variants || []).some(function(v){
-                var sizeOnly = String(v.title || '').split(' / ')[0].trim();
-                return v.available && selectedSizes.includes(sizeOnly);
-              });
-            var hasMarcaMatch = selectedMarcas.length === 0 ||
-              selectedMarcas.some(function(m){ return vendor === m; });
-            card.style.display = (hasSizeMatch && hasMarcaMatch) ? 'flex' : 'none';
-          } catch(e) {}
-        });
-      }
-
-      function updateFilterBadge() {
-        var active = root.querySelectorAll('.size-filter:checked, .marca-filter:checked').length;
-        var btn   = document.getElementById('btn-filter-toggle-' + SID);
-        var badge = document.getElementById('rc-filter-badge-' + SID);
-        if (btn) btn.classList.toggle('has-filters', active > 0);
-        if (badge) badge.textContent = active;
-      }
-
-      window['applyFilters_' + SID] = function() {
-        doFilterCards();
-        document.getElementById('filter-drawer-' + SID).classList.remove('is-open');
-        updateFilterBadge();
-      };
-
-      window['resetFilters_' + SID] = function() {
-        root.querySelectorAll('.size-filter, .marca-filter').forEach(function(el){ el.checked = false; });
-        root.querySelectorAll('.rc-card').forEach(function(card){ card.style.display = 'flex'; });
-        document.getElementById('filter-drawer-' + SID).classList.remove('is-open');
-        updateFilterBadge();
-      };
-
-      var drawer = document.getElementById('filter-drawer-' + SID);
-      if (drawer) {
-        drawer.addEventListener('change', function() { updateFilterBadge(); });
-      }
-
-      var btnFilter = document.getElementById('btn-filter-toggle-' + SID);
-      if (btnFilter) {
-        btnFilter.addEventListener('click', function() {
-          document.getElementById('filter-drawer-' + SID).classList.toggle('is-open');
-        });
-
-        // Tornar ícone flutuante ao rolar
-        window.addEventListener('scroll', function() {
-          var titleEl = root.querySelector('.rc-title');
-          if (!titleEl) return;
-          btnFilter.classList.toggle('is-floating', titleEl.getBoundingClientRect().bottom < 0);
-        });
-      }
-
-      // ── ORDENAÇÃO POR ESTOQUE (JS) ────────────────────────────────────
-      (function() {
-        var grid = root.querySelector('.rc-grid');
-        if (!grid || !allProducts.length) return;
-        function totalInv(p) {
-          return (p.variants || []).reduce(function(s, v) { return s + (v.inventory || 0); }, 0);
-        }
-        allProducts.slice().sort(function(a, b) { return totalInv(b) - totalInv(a); }).forEach(function(p) {
-          var card = root.querySelector('[data-product-id="' + p.id + '"]');
-          if (card) grid.appendChild(card);
-        });
-      })();
-
-      // ── DOWNLOAD FOTOS ────────────────────────────────────────────────
-      function safeFileName(name) {
-        return (name || 'produto').toLowerCase()
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 70) || 'produto';
-      }
-
-      function refFromPriceCents(n) {
-        n = parseInt(n, 10);
-        return isNaN(n) || n <= 0 ? '' : String(Math.floor(n / 100)).padStart(4, '0');
-      }
-
-      function variantsText(data) {
-        var variants = (data.variants || []).filter(function(v){ return !!v.available; });
-        if (!variants.length) return 'SEM ESTOQUE';
-        var labels = [];
-        var seen = {};
-        variants.forEach(function(v) {
-          var lbl = String((v.opt1 && v.opt1 !== 'Default Title') ? v.opt1 : (v.title || '')).trim();
-          if (lbl && !seen[lbl]) { seen[lbl] = 1; labels.push(lbl); }
-        });
-        labels.sort(function(a, b) { return a.localeCompare(b, 'pt-BR', {numeric:true}); });
-        return labels.join(' - ');
-      }
-
-      function loadImage(url) {
-        return new Promise(function(resolve, reject) {
-          var img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = function() { resolve(img); };
-          img.onerror = reject;
-          img.src = url;
-        });
-      }
-
-      function drawOverlay(baseImg, title, variantsTextStr, refNumber) {
-        var w = baseImg.naturalWidth || 1200;
-        var h = baseImg.naturalHeight || 1200;
-        var canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        var ctx = canvas.getContext('2d');
-        ctx.drawImage(baseImg, 0, 0, w, h);
-
-        var pad     = Math.round(w * 0.028);
-        var titleSz = Math.max(26, Math.round(w * 0.032));
-        var varSz   = Math.max(20, Math.round(w * 0.026));
-        var gapY    = Math.round(varSz * 0.22);
-        var boxH    = Math.max(Math.round(h * 0.095), Math.round(pad*0.75) + titleSz + gapY + varSz + Math.round(pad*0.75));
-        var yBox    = h - boxH;
-
-        ctx.save(); ctx.globalAlpha = 0.72; ctx.fillStyle = '#000'; ctx.fillRect(0, yBox, w, boxH); ctx.restore();
-        ctx.fillStyle = '#fff'; ctx.textBaseline = 'top';
-
-        ctx.font = '800 ' + titleSz + 'px system-ui,Arial';
-        var words = (title || '').trim().split(' ').slice(0, 4).join(' ');
-        ctx.fillText(words, pad, yBox + Math.round(pad * 0.75));
-
-        var vY = yBox + Math.round(pad * 0.75) + titleSz + gapY;
-        var refText = refNumber ? 'ref.: ' + refNumber : '';
-        if (refText) {
-          var refSz = Math.max(14, Math.round(varSz * 0.78));
-          ctx.font = '700 ' + refSz + 'px system-ui,Arial';
-          ctx.fillText(refText, w - pad - ctx.measureText(refText).width, vY + Math.max(0, Math.round((varSz - refSz) * 0.5)));
-        }
-        ctx.font = '700 ' + varSz + 'px system-ui,Arial';
-        ctx.fillText('Disponível: ' + variantsTextStr, pad, vY);
-
-        return canvas;
-      }
-
-      function canvasToBlob(canvas) {
-        return new Promise(function(resolve) { canvas.toBlob(function(b){ resolve(b); }, 'image/jpeg', 0.92); });
-      }
-
-      function downloadBlob(blob, filename) {
-        var url = URL.createObjectURL(blob);
-        var a   = document.createElement('a');
-        a.href  = url; a.download = filename;
-        document.body.appendChild(a);
-        try { a.click(); } catch(e) {}
-        a.remove();
-        setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} }, 3500);
-      }
-
-      function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
-
-      var btnDl  = document.getElementById('btn-download-all-' + SID);
-      var statusEl = document.getElementById('zip-status-' + SID);
-
-      function zipStatus(msg) { if (statusEl) statusEl.textContent = msg || ''; }
-
-      if (btnDl) {
-        btnDl.addEventListener('click', async function() {
-          btnDl.disabled = true;
-          zipStatus('Preparando downloads...');
-          try {
-            var cards = Array.from(root.querySelectorAll('.rc-card[data-product-id]'));
-            var ok = 0;
-            for (var i = 0; i < cards.length; i++) {
-              var pid = cards[i].getAttribute('data-product-id');
-              var dataEl = document.getElementById('data-' + pid);
-              if (!dataEl) continue;
-              var data;
-              try { data = JSON.parse(dataEl.textContent); } catch(e) { continue; }
-              zipStatus('Gerando ' + (i+1) + '/' + cards.length + '...');
-              var imgEl = cards[i].querySelector('.rc-media img');
-              var imgUrl = (imgEl && (imgEl.currentSrc || imgEl.src)) || data.image || '';
-              if (!imgUrl) continue;
-              var baseImg;
-              try { baseImg = await loadImage(imgUrl); } catch(e) {
-                try { if (data.image) baseImg = await loadImage(data.image); else continue; } catch(e2) { continue; }
-              }
-              var vText  = variantsText(data);
-              var refNum = refFromPriceCents(data.price_raw);
-              var canvas = drawOverlay(baseImg, data.title || '', vText, refNum);
-              var blob   = await canvasToBlob(canvas);
-              if (!blob) continue;
-              var name   = safeFileName(data.title || ('produto-' + pid));
-              var refPart = refNum ? ('-ref-' + refNum) : '';
-              downloadBlob(blob, String(i+1).padStart(2,'0') + '-' + name + refPart + '.jpg');
-              ok++;
-              await sleep(250);
-            }
-            zipStatus(ok ? 'Downloads iniciados ✅ (' + ok + ' arquivos)' : 'Nenhum produto encontrado.');
-          } catch(e) {
-            zipStatus('Erro ao baixar imagens');
-          } finally {
-            btnDl.disabled = false;
-          }
-        });
-      }
-
-      // ── QUICK BUY ─────────────────────────────────────────────────────
-      var modalWrap    = document.getElementById('modal-quick-buy-' + SID);
-      var modalContent = document.getElementById('modal-content-' + SID);
-
-      window['openQuickBuy'] = function(id) {
-        var dataEl = document.getElementById('data-' + id);
+      window.openQuickBuy = function(id) {
+        const dataEl = document.getElementById('data-' + id);
         if (!dataEl) return;
-        var data;
-        try { data = JSON.parse(dataEl.textContent); } catch(e) { return; }
+        const data = JSON.parse(dataEl.textContent);
+        const modal = document.getElementById('modal-quick-buy');
+        const content = document.getElementById('modal-content');
+        if (!modal || !content) return;
+        content.replaceChildren();
 
-        var variantsHtml = (data.variants || []).map(function(v) {
-          return '<button onclick="selectVariant_' + SID + '(this, \'' + v.id + '\')" class="sz-btn" ' + (!v.available ? 'disabled' : '') +
-            ' style="padding:12px; border:1px solid #ddd; border-radius:4px; background:' + (v.available ? '#fff' : '#f5f5f5') + '; cursor:pointer; font-weight:700; opacity:' + (v.available ? '1' : '0.4') + '">' +
-            v.title + '</button>';
-        }).join('');
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'qb-close';
+        closeBtn.setAttribute('aria-label', 'Fechar');
+        closeBtn.textContent = '×';
+        closeBtn.addEventListener('click', window.closeQuickBuy);
 
-        modalContent.innerHTML =
-          '<button onclick="closeQuickBuy_' + SID + '()" style="position:absolute;top:15px;right:15px;border:none;background:none;font-size:24px;cursor:pointer;">&times;</button>' +
-          '<div style="display:flex;gap:15px;align-items:center;margin-bottom:20px;">' +
-            '<img src="' + (data.image || '') + '" style="width:70px;height:70px;object-fit:cover;border-radius:8px;">' +
-            '<div><h4 style="margin:0;font-size:14px;">' + (data.title || '') + '</h4>' +
-            '<div style="font-weight:800;font-size:16px;">' + (data.price || '') + '</div></div>' +
-          '</div>' +
-          '<div style="font-size:12px;font-weight:800;margin-bottom:10px;">ESCOLHA O TAMANHO:</div>' +
-          '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;">' + variantsHtml + '</div>' +
-          '<button id="btn-add-final-' + SID + '" disabled onclick="finalizeAdd_' + SID + '(this)" style="width:100%;padding:16px;background:#111;color:#fff;border:none;border-radius:4px;font-weight:800;cursor:pointer;opacity:0.5;">ADICIONAR À SACOLA</button>';
+        const header = document.createElement('div');
+        header.className = 'qb-header';
+        const img = document.createElement('img');
+        img.src = data.image;
+        img.alt = data.title || '';
+        img.className = 'qb-thumb';
+        img.width = 70;
+        img.height = 70;
+        const headerText = document.createElement('div');
+        const title = document.createElement('h4');
+        title.className = 'qb-title';
+        title.textContent = data.title;
+        const price = document.createElement('div');
+        price.className = 'qb-price';
+        price.textContent = data.price;
+        headerText.append(title, price);
+        header.append(img, headerText);
 
-        window['_selectedVariant_' + SID] = null;
-        modalWrap.classList.add('nb-open');
+        const label = document.createElement('div');
+        label.className = 'qb-label';
+        label.textContent = 'ESCOLHA O TAMANHO:';
+
+        const grid = document.createElement('div');
+        grid.className = 'qb-grid';
+        data.variants.forEach(v => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'sz-btn';
+          btn.textContent = v.title;
+          btn.dataset.variantId = String(v.id);
+          if (!v.available) {
+            btn.disabled = true;
+            btn.classList.add('is-unavailable');
+          }
+          btn.addEventListener('click', () => window.selectVariant(btn, v.id));
+          grid.appendChild(btn);
+        });
+
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.id = 'btn-add-final';
+        addBtn.className = 'qb-add';
+        addBtn.disabled = true;
+        addBtn.textContent = 'ADICIONAR À SACOLA';
+        addBtn.addEventListener('click', () => window.finalizeAdd(addBtn));
+
+        content.append(closeBtn, header, label, grid, addBtn);
+        modal.classList.add('nb-open');
       };
 
-      window['selectVariant_' + SID] = function(btn, id) {
-        root.querySelectorAll('.sz-btn').forEach(function(b){ b.style.borderColor = '#ddd'; });
-        btn.style.borderColor = '#111';
-        window['_selectedVariant_' + SID] = id;
-        var finalBtn = document.getElementById('btn-add-final-' + SID);
-        if (finalBtn) { finalBtn.disabled = false; finalBtn.style.opacity = '1'; }
+      window.selectedId = null;
+      window.selectVariant = function(btn, id) {
+        const prev = btn.parentElement && btn.parentElement.querySelector('.sz-btn.is-selected');
+        if (prev) prev.classList.remove('is-selected');
+        btn.classList.add('is-selected');
+        window.selectedId = id;
+        const finalBtn = document.getElementById('btn-add-final');
+        if (finalBtn) {
+          finalBtn.disabled = false;
+          finalBtn.classList.add('is-ready');
+        }
       };
 
-      window['finalizeAdd_' + SID] = function(btn) {
-        var vid = window['_selectedVariant_' + SID];
-        if (!vid) return;
-        btn.innerText = 'ADICIONANDO...';
+      window.finalizeAdd = function(btn) {
+        btn.innerText = "ADICIONANDO...";
         fetch('/cart/add.js', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ items: [{ id: vid, quantity: 1 }] })
-        }).then(function() {
-          btn.innerText = 'ADICIONAR À SACOLA';
-          closeQuickBuy_{{ section.id }}();
-          // Tentar abrir o drawer de carrinho
-          ['cart:open','cart:refresh','cart:updated','product:added'].forEach(function(ev) {
-            try { document.dispatchEvent(new CustomEvent(ev, {bubbles:true})); } catch(e){}
-          });
-          setTimeout(function() {
-            var cartBtn = document.querySelector('[data-cart-drawer],[class*="cart-toggle"],button[aria-label*="Cart"]');
-            if (cartBtn) cartBtn.click();
+          body: JSON.stringify({ items: [{ id: window.selectedId, quantity: 1 }] })
+        }).then(() => {
+          btn.innerText = "ADICIONAR À SACOLA";
+          document.getElementById('modal-quick-buy').classList.remove('nb-open');
+          setTimeout(() => {
+            const cartDrawer = document.querySelector('[id*="CartDrawer"], [class*="cart-drawer"], [class*="Cart-drawer"]');
+            if (cartDrawer) {
+              cartDrawer.classList.add('is-open');
+              return;
+            }
+            const cartBtn = document.querySelector('[data-cart-drawer], [class*="cart-toggle"], button[aria-label*="Cart"]');
+            if (cartBtn) { cartBtn.click(); return; }
+            document.dispatchEvent(new CustomEvent('cart:open'));
+            window.dispatchEvent(new CustomEvent('cart:open'));
+            alert("✅ Produto adicionado à sacola com sucesso!");
           }, 300);
-        }).catch(function() {
-          btn.innerText = 'ADICIONAR À SACOLA';
-          alert('Erro ao adicionar. Tente novamente.');
+        }).catch((err) => {
+          btn.innerText = "ADICIONAR À SACOLA";
+          console.error(err);
+          alert("❌ Erro ao adicionar. Tente novamente.");
         });
       };
 
-      window['closeQuickBuy_' + SID] = function() {
-        if (modalWrap) modalWrap.classList.remove('nb-open');
+      window.closeQuickBuy = function() {
+        document.getElementById('modal-quick-buy').classList.remove('nb-open');
       };
-
-      // Inicializar
-      renderFilters();
-
     })();
   </script>
 
@@ -655,16 +378,42 @@ Royal • Search Template — idêntico ao Collection Gummy Style (v1.0)
 
 {% schema %}
 {
-  "name": "Search page",
+  "name": "Search Royal Gummy",
   "settings": [
-    { "type": "color", "id": "bg",       "label": "Fundo da Página",   "default": "#FFFFFF" },
-    { "type": "color", "id": "card_bg",  "label": "Fundo do Card",     "default": "#FFFFFF" },
-    { "type": "color", "id": "primary",  "label": "Cor de Texto",      "default": "#111111" },
-    { "type": "color", "id": "green",    "label": "Cor do Botão",      "default": "#B6E35C" },
-    { "type": "color", "id": "badge_bg", "label": "Cor do Badge",      "default": "#1a1a1a" },
-    { "type": "range", "id": "badge_opacity", "min": 0, "max": 100, "step": 10, "unit": "%", "label": "Opacidade do Badge", "default": 100 },
-    { "type": "range", "id": "card_radius", "min": 0, "max": 30, "step": 1, "unit": "px", "label": "Arredondamento dos Cards", "default": 6 },
-    { "type": "link_list", "id": "quick_links", "label": "Menu de Categorias (sidebar)" }
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Produtos por página",
+      "min": 12,
+      "max": 60,
+      "step": 4,
+      "default": 24
+    },
+    { "type": "header", "content": "Cores (espelha collection-template)" },
+    { "type": "color", "id": "bg",         "label": "Fundo da seção",       "default": "#FFFFFF" },
+    { "type": "color", "id": "card_bg",    "label": "Fundo do card",        "default": "#ffffff" },
+    { "type": "color", "id": "primary",    "label": "Texto principal",      "default": "#111111" },
+    { "type": "color", "id": "text",       "label": "Texto secundário",     "default": "#333333" },
+    { "type": "color", "id": "green",      "label": "Verde (preço atacado)","default": "#B6E35C" },
+    { "type": "color", "id": "badge_bg",   "label": "Fundo do badge",       "default": "#1a1a1a" },
+    {
+      "type": "range",
+      "id": "badge_opacity",
+      "label": "Opacidade do badge",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Raio dos cards (px)",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 6
+    }
   ]
 }
 {% endschema %}

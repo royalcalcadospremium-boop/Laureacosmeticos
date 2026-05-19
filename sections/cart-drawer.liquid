@@ -205,6 +205,47 @@ AJUSTE (pedido do Fellipe):
     #RoyalCartDrawer .rcd__totals-label{ color: var(--rcd-muted); font-weight: 800; }
     #RoyalCartDrawer .rcd__totals-value{ font-weight: 950; }
 
+    /* Economia atacado — destaque em vermelho abaixo do total */
+    #RoyalCartDrawer .rcd__savings{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--rcd-border);
+      color: #d70015;
+    }
+    #RoyalCartDrawer .rcd__savings[hidden]{ display: none; }
+    #RoyalCartDrawer .rcd__savings-label{
+      font-size: var(--ad-type-caption-size);
+      font-weight: var(--ad-type-caption-weight);
+      letter-spacing: var(--ad-type-caption-track);
+      color: #d70015;
+    }
+    #RoyalCartDrawer .rcd__savings-value{
+      font-size: var(--ad-type-body-strong-size);
+      font-weight: var(--ad-type-body-strong-weight);
+      letter-spacing: var(--ad-type-body-strong-track);
+      color: #d70015;
+    }
+
+    /* Bloco discreto de peso total */
+    #RoyalCartDrawer .rcd__weight{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--rcd-border);
+      font-size: 12px;
+      color: var(--rcd-muted);
+    }
+    #RoyalCartDrawer .rcd__weight[hidden]{ display: none; }
+    #RoyalCartDrawer .rcd__weight-label{ font-weight: 600; }
+    #RoyalCartDrawer .rcd__weight-value{ font-weight: 700; color: var(--rcd-text); }
+
     /* =========================
        ITENS — 2 LINHAS
        ========================= */
@@ -219,7 +260,7 @@ AJUSTE (pedido do Fellipe):
 
     #RoyalCartDrawer .rcd__thumb{
       width: 52px; height: 52px;
-      border-radius: 14px;
+      border-radius: 0;
       overflow:hidden;
       background: #F3F4F6;
       flex: 0 0 auto;
@@ -333,7 +374,7 @@ AJUSTE (pedido do Fellipe):
 
     #RoyalCartDrawer .rcd__qty-btn{
       width: 24px; height: 24px;
-      border-radius: 999px;
+      border-radius: 0;
       border: 0;
       background: transparent;
       cursor:pointer;
@@ -469,6 +510,45 @@ AJUSTE (pedido do Fellipe):
     }
     #RoyalCartDrawer .rcd__vendors{ margin-top: 14px; display: grid; gap: 10px; }
 
+    /* === Botão verde "Finalizar aqui no site" — só aparece quando todos sync === */
+    .rcd__site-checkout{ margin-top: 16px; }
+    .rcd__site-checkout[hidden]{ display: none; }
+    .rcd__btn-finalize{
+      width: 100%;
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px;
+      background: #25D366; color: #fff;
+      border: 0; border-radius: 9999px;
+      padding: 16px 24px;
+      font-size: 16px; font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.32);
+      transition: transform 120ms ease-out, opacity 120ms ease-out;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .rcd__btn-finalize:hover{ opacity: 0.95; }
+    .rcd__btn-finalize:active{ transform: scale(0.97); }
+    .rcd__btn-finalize svg{ flex: 0 0 auto; }
+    .rcd__finalize-divider{
+      position: relative;
+      text-align: center;
+      margin: 16px 0 6px;
+      color: #6B7280; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .rcd__finalize-divider::before,
+    .rcd__finalize-divider::after{
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: calc(50% - 110px);
+      height: 1px;
+      background: var(--rcd-border, #E5E7EB);
+    }
+    .rcd__finalize-divider::before{ left: 0; }
+    .rcd__finalize-divider::after{ right: 0; }
+    .rcd__finalize-divider span{ background: var(--rcd-modal-bg, #fff); padding: 0 12px; position: relative; }
+
     #RoyalCartDrawer .rcd__vendor{
       display:flex; align-items:center; justify-content:space-between; gap: 12px;
       padding: 12px 12px;
@@ -518,6 +598,176 @@ AJUSTE (pedido do Fellipe):
       text-overflow: ellipsis;
     }
     #RoyalCartDrawer .rcd__vendor span{ font-weight: 950; opacity: .9; white-space: nowrap; }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       APPLE DESIGN.md COMPLIANCE — overrides finais que normalizam
+       toda a tipografia do drawer aos tokens do Subsistema 0 (--ad-*).
+       Substitui weights extra-bold (650/700/800/900/950) e font-family
+       genérico (ui-sans-serif) pela escala oficial Apple: 300/400/600/700
+       + stack system-ui→Inter Variable.
+       ═══════════════════════════════════════════════════════════════════ */
+
+    /* Stack de fonte Apple em TODOS elementos do drawer */
+    #RoyalCartDrawer,
+    #RoyalCartDrawer * {
+      font-family: var(--ad-font-text) !important;
+    }
+
+    /* Título "Seu carrinho" → tagline (21px / 600 / -0.231 tracking) */
+    #RoyalCartDrawer .rcd__title {
+      font-family: var(--ad-font-display) !important;
+      font-size: var(--ad-type-tagline-size) !important;
+      font-weight: var(--ad-type-tagline-weight) !important;
+      line-height: var(--ad-type-tagline-lh) !important;
+      letter-spacing: var(--ad-type-tagline-track) !important;
+    }
+
+    /* Subtitle → caption (14px / 400 / -0.224 tracking) */
+    #RoyalCartDrawer .rcd__subtitle {
+      font-size: var(--ad-type-caption-size) !important;
+      font-weight: var(--ad-type-caption-weight) !important;
+      line-height: var(--ad-type-caption-lh) !important;
+      letter-spacing: var(--ad-type-caption-track) !important;
+      color: var(--ad-color-ink-muted-48) !important;
+    }
+
+    /* Texto de pedido mínimo → caption (14px / 400) */
+    #RoyalCartDrawer .rcd__mintext {
+      font-size: var(--ad-type-caption-size) !important;
+      font-weight: var(--ad-type-caption-weight) !important;
+      line-height: var(--ad-type-caption-lh) !important;
+      letter-spacing: var(--ad-type-caption-track) !important;
+      color: var(--ad-color-ink-muted-48) !important;
+    }
+
+    /* Nome do produto na linha do item → body-strong compacto (14px / 600) */
+    #RoyalCartDrawer .rcd__titlelink,
+    #RoyalCartDrawer .rcd__name {
+      font-size: var(--ad-type-caption-strong-size) !important;
+      font-weight: var(--ad-type-caption-strong-weight) !important;
+      line-height: var(--ad-type-caption-strong-lh) !important;
+      letter-spacing: var(--ad-type-caption-strong-track) !important;
+      color: var(--ad-color-ink) !important;
+    }
+
+    /* Variante inline (39/40 etc) → caption (14px / 400) */
+    #RoyalCartDrawer .rcd__variant-inline,
+    #RoyalCartDrawer .rcd__variant {
+      font-size: var(--ad-type-caption-size) !important;
+      font-weight: var(--ad-type-caption-weight) !important;
+      letter-spacing: var(--ad-type-caption-track) !important;
+      color: var(--ad-color-ink-muted-48) !important;
+    }
+
+    /* Preço unitário do item → body-strong (17px / 600) */
+    #RoyalCartDrawer .rcd__price-final {
+      font-size: var(--ad-type-body-strong-size) !important;
+      font-weight: var(--ad-type-body-strong-weight) !important;
+      line-height: var(--ad-type-body-strong-lh) !important;
+      letter-spacing: var(--ad-type-body-strong-track) !important;
+      color: var(--ad-color-ink) !important;
+    }
+    #RoyalCartDrawer .rcd__price-compare {
+      font-size: var(--ad-type-caption-size) !important;
+      font-weight: var(--ad-type-caption-weight) !important;
+      color: var(--ad-color-ink-muted-48) !important;
+    }
+
+    /* Quantidade — botões e input */
+    #RoyalCartDrawer .rcd__qty-btn,
+    #RoyalCartDrawer .rcd__qty-input {
+      font-size: var(--ad-type-body-size) !important;
+      font-weight: var(--ad-type-body-weight) !important;
+      letter-spacing: 0 !important;
+    }
+
+    /* Total label → body (17px / 400) */
+    #RoyalCartDrawer .rcd__totals-label {
+      font-size: var(--ad-type-body-size) !important;
+      font-weight: var(--ad-type-body-weight) !important;
+      letter-spacing: var(--ad-type-body-track) !important;
+      color: var(--ad-color-ink-muted-80) !important;
+    }
+    /* Total valor → body-strong (17px / 600) */
+    #RoyalCartDrawer .rcd__totals-value {
+      font-size: var(--ad-type-body-strong-size) !important;
+      font-weight: var(--ad-type-body-strong-weight) !important;
+      letter-spacing: var(--ad-type-body-strong-track) !important;
+      color: var(--ad-color-ink) !important;
+    }
+
+    /* Peso total estimado → fine-print (12px / 400) */
+    #RoyalCartDrawer .rcd__weight-label,
+    #RoyalCartDrawer .rcd__weight-value {
+      font-size: var(--ad-type-fine-print-size) !important;
+      font-weight: var(--ad-type-fine-print-weight) !important;
+      letter-spacing: var(--ad-type-fine-print-track) !important;
+    }
+    #RoyalCartDrawer .rcd__weight-label { color: var(--ad-color-ink-muted-48) !important; }
+    #RoyalCartDrawer .rcd__weight-value { color: var(--ad-color-ink) !important; }
+
+    /* Botões principais → body (17px / 400) — Apple pill style */
+    #RoyalCartDrawer .rcd__btn,
+    #RoyalCartDrawer .rcd__btn--primary,
+    #RoyalCartDrawer .rcd__btn--ghost {
+      font-size: var(--ad-type-body-size) !important;
+      font-weight: var(--ad-type-body-weight) !important;
+      line-height: 1 !important;
+      letter-spacing: var(--ad-type-body-track) !important;
+    }
+
+    /* Botão verde "Finalizar aqui no site" — mantém destaque mas com Apple body weight */
+    #RoyalCartDrawer .rcd__btn-finalize {
+      font-size: var(--ad-type-body-size) !important;
+      font-weight: 600 !important;  /* exceção: body-strong pra dar peso visual no CTA */
+      letter-spacing: var(--ad-type-body-track) !important;
+    }
+
+    /* Modal de vendedoras — título, sub, vendor cards */
+    #RoyalCartDrawer .rcd__vmodal-title {
+      font-family: var(--ad-font-display) !important;
+      font-size: var(--ad-type-tagline-size) !important;
+      font-weight: var(--ad-type-tagline-weight) !important;
+      letter-spacing: var(--ad-type-tagline-track) !important;
+    }
+    #RoyalCartDrawer .rcd__vmodal-sub {
+      font-size: var(--ad-type-caption-size) !important;
+      font-weight: var(--ad-type-caption-weight) !important;
+      color: var(--ad-color-ink-muted-80) !important;
+    }
+    #RoyalCartDrawer .rcd__vendor-name {
+      font-size: var(--ad-type-body-strong-size) !important;
+      font-weight: var(--ad-type-body-strong-weight) !important;
+      color: var(--ad-color-ink) !important;
+    }
+    #RoyalCartDrawer .rcd__vendor small {
+      font-size: var(--ad-type-caption-size) !important;
+      font-weight: var(--ad-type-caption-weight) !important;
+      color: var(--ad-color-ink-muted-48) !important;
+    }
+    #RoyalCartDrawer .rcd__vendor span {
+      font-size: var(--ad-type-body-size) !important;
+      font-weight: var(--ad-type-body-weight) !important;
+    }
+
+    /* Empty state */
+    #RoyalCartDrawer .rcd__empty-title {
+      font-family: var(--ad-font-display) !important;
+      font-size: var(--ad-type-display-md-size) !important;
+      font-weight: var(--ad-type-display-md-weight) !important;
+      letter-spacing: var(--ad-type-display-md-track) !important;
+    }
+    #RoyalCartDrawer .rcd__empty-text {
+      font-size: var(--ad-type-body-size) !important;
+      font-weight: var(--ad-type-body-weight) !important;
+      color: var(--ad-color-ink-muted-80) !important;
+    }
+
+    /* Upsell cards */
+    #RoyalCartDrawer .rcd__upsell-card,
+    #RoyalCartDrawer .rcd__upsell-card * {
+      font-family: var(--ad-font-text) !important;
+    }
   </style>
 
   <div class="rcd__overlay" data-rcd-overlay aria-hidden="true"></div>
@@ -696,6 +946,18 @@ AJUSTE (pedido do Fellipe):
         <strong class="rcd__totals-value" data-rcd-subtotal>{{ cart.total_price | money }}</strong>
       </div>
 
+      {%- comment -%} Economia no atacado — em vermelho, só aparece se houver desconto {%- endcomment -%}
+      <div class="rcd__savings" data-rcd-savings-row hidden>
+        <span class="rcd__savings-label">Você economiza no atacado</span>
+        <span class="rcd__savings-value" data-rcd-savings>—</span>
+      </div>
+
+      {%- comment -%} Peso total — bloco discreto, minimalista {%- endcomment -%}
+      <div class="rcd__weight" data-rcd-weight-row hidden>
+        <span class="rcd__weight-label">Peso total estimado</span>
+        <span class="rcd__weight-value" data-rcd-weight>—</span>
+      </div>
+
       <div class="rcd__actions">
         <button type="button" class="rcd__btn rcd__btn--primary" data-rcd-request>
           {{ section.settings.checkout_label | escape }}
@@ -708,13 +970,29 @@ AJUSTE (pedido do Fellipe):
     </footer>
   </aside>
 
-  <!-- MODAL: ESCOLHER VENDEDORA -->
+  <!-- MODAL: FINALIZAR COMPRA (site checkout + vendedoras) -->
   <div class="rcd__vmodal" id="rcd-vmodal" aria-hidden="true">
     <div class="rcd__vmodal-overlay" data-rcd-vclose></div>
-    <div class="rcd__vmodal-panel" role="dialog" aria-modal="true" aria-label="Escolher vendedora">
+    <div class="rcd__vmodal-panel" role="dialog" aria-modal="true" aria-label="Finalizar pedido">
       <button class="rcd__vmodal-close" type="button" data-rcd-vclose aria-label="Fechar">✕</button>
-      <div class="rcd__vmodal-title">{{ section.settings.modal_title | escape }}</div>
-      <div class="rcd__vmodal-sub">{{ section.settings.modal_subtitle | escape }}</div>
+      <div class="rcd__vmodal-title" data-rcd-vmodal-title>{{ section.settings.modal_title | escape }}</div>
+      <div class="rcd__vmodal-sub" data-rcd-vmodal-sub>{{ section.settings.modal_subtitle | escape }}</div>
+
+      {%- comment -%}
+        Botão verde "Finalizar compra aqui no site" — aparece DINAMICAMENTE via JS
+        somente quando TODOS os items do carrinho estão sincronizados (tag 'synced-olist'
+        ou variant.inventory_management='shopify'). Caso contrário (algum não sync),
+        o JS oculta este bloco e mostra só as vendedoras abaixo.
+      {%- endcomment -%}
+      <div class="rcd__site-checkout" id="rcd-site-checkout" hidden>
+        <button class="rcd__btn-finalize" type="button" id="rcd-finalize-onsite">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Finalizar compra aqui no site
+        </button>
+        <div class="rcd__finalize-divider"><span>ou consulte uma vendedora</span></div>
+      </div>
 
       <div class="rcd__vendors">
         {% assign vendor_blocks = section.blocks | where: 'type', 'vendor' %}
@@ -802,11 +1080,18 @@ AJUSTE (pedido do Fellipe):
 
       const isOpen = () => root.classList.contains('is-open') || root.hasAttribute('open');
 
-      const openDrawer = () => {
+      const openDrawer = async () => {
         root.classList.add('is-open');
         root.setAttribute('open','');
         if(panel) panel.setAttribute('aria-hidden','false');
         lockScroll();
+        // Refresh content em background — pega items recém-adicionados de outras
+        // sections (Royal Ofertas Duo, collection cards, etc.) sem precisar
+        // de reload de página. Falha silenciosa se cart.js timeout.
+        try {
+          const cart = await fetchCart();
+          refreshUIFromCart(cart);
+        } catch (e) { /* noop */ }
       };
 
       const closeDrawer = () => {
@@ -852,11 +1137,121 @@ AJUSTE (pedido do Fellipe):
       const itemsWrap = root.querySelector('[data-rcd-items]');
       const subtotalEl = root.querySelector('[data-rcd-subtotal]');
 
-      const openModal = () => {
+      // ===== Detecção: todos produtos sincronizados Tiny/Olist? =====
+      // Critério: tag 'synced-olist' OU variant.inventory_management='shopify'
+      // Cache de products já consultados (evita refetch a cada open do modal)
+      const productCache = new Map();
+      async function isCartFullySynced() {
+        try {
+          const cart = await fetch('/cart.js', { headers: { 'Accept': 'application/json' } }).then(r => r.json());
+          if (!cart.items || cart.items.length === 0) return true;
+          const uniqueHandles = [...new Set(cart.items.map(i => i.handle))];
+          const products = await Promise.all(uniqueHandles.map(async handle => {
+            if (productCache.has(handle)) return productCache.get(handle);
+            const p = await fetch('/products/' + handle + '.js', { headers: { 'Accept': 'application/json' } }).then(r => r.json());
+            productCache.set(handle, p);
+            return p;
+          }));
+          for (const p of products) {
+            const tags = (p.tags || []).map(t => String(t).toLowerCase());
+            const hasConsultarVendedor = tags.includes('consultar-vendedor');
+            if (hasConsultarVendedor) return false;
+            const hasSyncedTag = tags.includes('synced-olist');
+            const hasTrackedInventory = (p.variants || []).some(v => v.inventory_management === 'shopify');
+            const isSynced = hasSyncedTag || hasTrackedInventory;
+            if (!isSynced) return false;
+          }
+          return true;
+        } catch (e) {
+          return false; // fallback seguro: oculta botão verde se algo falhar
+        }
+      }
+
+      const siteCheckoutWrap = document.getElementById('rcd-site-checkout');
+      const finalizeBtn = document.getElementById('rcd-finalize-onsite');
+      const vmodalTitle = root.querySelector('[data-rcd-vmodal-title]');
+      const vmodalSub = root.querySelector('[data-rcd-vmodal-sub]');
+
+      if (finalizeBtn) {
+        // Salva o HTML original do botão (com SVG + texto) pra restaurar caso falhe
+        const finalizeOriginalHTML = finalizeBtn.firstElementChild
+          ? finalizeBtn.firstElementChild.cloneNode(true)
+          : null;
+        const finalizeOriginalText = (finalizeBtn.textContent || '').trim();
+
+        const setBtnLoading = () => {
+          finalizeBtn.disabled = true;
+          finalizeBtn.style.opacity = '0.7';
+          // Limpa filhos + define texto seguro
+          while (finalizeBtn.firstChild) finalizeBtn.removeChild(finalizeBtn.firstChild);
+          finalizeBtn.textContent = 'Redirecionando…';
+        };
+        const restoreBtn = () => {
+          finalizeBtn.disabled = false;
+          finalizeBtn.style.opacity = '';
+          while (finalizeBtn.firstChild) finalizeBtn.removeChild(finalizeBtn.firstChild);
+          if (finalizeOriginalHTML) finalizeBtn.appendChild(finalizeOriginalHTML.cloneNode(true));
+          finalizeBtn.appendChild(document.createTextNode(' ' + finalizeOriginalText));
+        };
+
+        finalizeBtn.addEventListener('click', async () => {
+          // Estratégia: replicar o mesmo POST que YampiSnippet.liquid faz
+          // no /cart, mas direto daqui pra pular a página intermediária.
+          // Isso vale pra qualquer config do Yampi (skip_cart true ou false).
+          setBtnLoading();
+          try {
+            const cartPayload = await fetch('/cart.json', {
+              headers: { 'Accept': 'application/json' },
+              credentials: 'same-origin'
+            }).then(r => r.json());
+            const body = JSON.stringify({
+              shop: window.location.host,
+              shopify_internal_domain: {{ shop.permanent_domain | json }},
+              cart_payload: cartPayload
+            });
+            const r = await fetch('https://api.dooki.com.br/v2/public/shopify/cart', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body
+            });
+            const resp = await r.json();
+            if (resp && resp.checkout_direct_url) {
+              // limpa o carrinho do Shopify antes (mesma sequência do YampiSnippet linha 88-90)
+              try { await fetch('/cart/clear.js', { method: 'POST' }); } catch(e) {}
+              const url = (typeof ymp_getUrlWithUtms === 'function')
+                ? ymp_getUrlWithUtms(resp.checkout_direct_url)
+                : resp.checkout_direct_url;
+              window.location.href = url;
+              return;
+            }
+            // Fallback: navega pra /cart e deixa o YampiSnippet completar lá
+            window.location.href = '/cart';
+          } catch (e) {
+            window.location.href = '/cart';
+          } finally {
+            // Se ainda estiver na página depois de 4s (não redirecionou), restaura botão
+            setTimeout(restoreBtn, 4000);
+          }
+        });
+      }
+
+      const openModal = async () => {
         if(!modal) return;
         modal.classList.add('is-open');
         modal.setAttribute('aria-hidden','false');
         lockScroll();
+        // Decide assincronamente se mostra o botão verde
+        if (siteCheckoutWrap) {
+          siteCheckoutWrap.hidden = true; // start hidden enquanto verifica
+          if (vmodalTitle) vmodalTitle.textContent = 'Escolha uma vendedora';
+          if (vmodalSub) vmodalSub.textContent = 'Selecione para encaminhar seu orçamento no WhatsApp.';
+          const allSynced = await isCartFullySynced();
+          if (allSynced) {
+            siteCheckoutWrap.hidden = false;
+            if (vmodalTitle) vmodalTitle.textContent = 'Como você quer finalizar?';
+            if (vmodalSub) vmodalSub.textContent = 'Você pode pagar agora pelo site ou falar com uma vendedora.';
+          }
+        }
       };
       const closeModal = () => {
         if(!modal) return;
@@ -906,7 +1301,7 @@ AJUSTE (pedido do Fellipe):
         if(qtyTotal <= 0){
           minTextEl.textContent = emptyText;
         } else if(missing > 0){
-          minTextEl.textContent = (prefix || 'Faltam') + ' ' + missing + ' ' + (suffix || 'itens para atingir o pedido mínimo.');
+          minTextEl.textContent = (prefix || 'Faltam') + ' ' + missing + ' ' + (suffix || 'itens para Completar o atacado.');
         } else {
           minTextEl.textContent = okText;
         }
@@ -1159,9 +1554,81 @@ AJUSTE (pedido do Fellipe):
         itemsWrap.innerHTML = html;
       };
 
+      const weightRowEl = root.querySelector('[data-rcd-weight-row]');
+      const weightValEl = root.querySelector('[data-rcd-weight]');
+      const savingsRowEl = root.querySelector('[data-rcd-savings-row]');
+      const savingsValEl = root.querySelector('[data-rcd-savings]');
+
+      // Sanity max: nenhum item de calçado/acessório deve pesar > 5kg unitário.
+      // Se Shopify devolve > 5000g por unidade, é provável bug de unidade (kg gravado como g),
+      // então dividimos por 1000 só para EXIBIR (a correção real é via sync/cleanup).
+      const PER_UNIT_MAX_GRAMS = 5000;
+      const TOTAL_MAX_GRAMS    = 50000; // 50 kg total — qualquer coisa acima é dado corrompido
+      const sanitizeTotalWeight = (cart) => {
+        const items = (cart && cart.items) || [];
+        let total = 0;
+        let hasPerItemGrams = false;
+        for (const it of items) {
+          const qty = Number(it.quantity) || 0;
+          const perUnit = Number(it.grams);
+          if (Number.isFinite(perUnit) && perUnit > 0) {
+            hasPerItemGrams = true;
+            const safePerUnit = perUnit > PER_UNIT_MAX_GRAMS ? perUnit / 1000 : perUnit;
+            total += safePerUnit * qty;
+          }
+        }
+        // Fallback: se nenhum item exposou .grams, usa cart.total_weight
+        if (!hasPerItemGrams) total = Number(cart && cart.total_weight) || 0;
+        // Sanity de cinto + suspensório: se total ainda absurdo (>50kg), divide por 1000.
+        while (total > TOTAL_MAX_GRAMS) total = total / 1000;
+        return Math.round(total);
+      };
+
+      const formatWeight = (grams) => {
+        const g = Number(grams) || 0;
+        if (g <= 0) return '';
+        if (g < 1000) return g + ' g';
+        return (g / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kg';
+      };
+      const updateWeightUI = (totalGrams) => {
+        const txt = formatWeight(totalGrams);
+        if (!weightRowEl || !weightValEl) return;
+        if (txt) {
+          weightValEl.textContent = txt;
+          weightRowEl.hidden = false;
+        } else {
+          weightRowEl.hidden = true;
+        }
+      };
+
+      const updateSavingsUI = (cart) => {
+        if (!savingsRowEl || !savingsValEl) return;
+        // Economia = soma de (original_line_price - final_line_price) de cada item.
+        // Cobre: discounts automáticos, compare_at_price em variants (tier atacado).
+        const items = (cart && cart.items) || [];
+        let savingsCents = 0;
+        for (const it of items) {
+          const orig  = Number(it.original_line_price) || 0;
+          const final = Number(it.final_line_price) || Number(it.line_price) || 0;
+          if (orig > final) savingsCents += (orig - final);
+        }
+        // Fallback: cart.total_discount (descontos no cart, ex: Shopify Functions)
+        const cartDiscount = Number(cart.total_discount) || 0;
+        if (cartDiscount > savingsCents) savingsCents = cartDiscount;
+
+        if (savingsCents > 0) {
+          savingsValEl.textContent = '− ' + formatMoneyBRL(savingsCents);
+          savingsRowEl.hidden = false;
+        } else {
+          savingsRowEl.hidden = true;
+        }
+      };
+
       const refreshUIFromCart = (cart) => {
         updateMinUI(sumQty(cart.items || []));
         if(subtotalEl) subtotalEl.textContent = formatMoneyBRL(cart.total_price || 0);
+        updateWeightUI(sanitizeTotalWeight(cart));
+        updateSavingsUI(cart);
         renderItems(cart);
       };
 
@@ -1308,9 +1775,9 @@ AJUSTE (pedido do Fellipe):
 
     { "type": "header", "content": "Pedido mínimo por quantidade" },
     { "type": "range", "id": "min_items", "label": "Mínimo de itens no carrinho", "min": 1, "max": 50, "step": 1, "default": 10 },
-    { "type": "text", "id": "min_empty_text", "label": "Texto quando carrinho vazio", "default": "Adicione produtos para atingir o mínimo de 10 itens." },
+    { "type": "text", "id": "min_empty_text", "label": "Texto quando carrinho vazio", "default": "Adicione produtos para Completar o atacado." },
     { "type": "text", "id": "min_missing_prefix", "label": "Texto (prefixo) faltando itens", "default": "Faltam" },
-    { "type": "text", "id": "min_missing_suffix", "label": "Texto (sufixo) faltando itens", "default": "itens para atingir o pedido mínimo." },
+    { "type": "text", "id": "min_missing_suffix", "label": "Texto (sufixo) faltando itens", "default": "itens para Completar o atacado." },
     { "type": "text", "id": "min_ok_text", "label": "Texto quando mínimo atingido", "default": "Pedido mínimo atingido ✅ Escolha uma vendedora para enviar o orçamento." },
 
     { "type": "header", "content": "Carrinho vazio" },
