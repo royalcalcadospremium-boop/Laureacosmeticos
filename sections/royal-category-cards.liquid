@@ -101,7 +101,9 @@ Royal • Categoria Cards v9.6.1
     #royal-cats-{{ section.id }} .track{
       display: flex; flex-wrap: nowrap;
       gap: var(--gap);
-      justify-content: flex-start;
+      /* safe center: centraliza quando os cards cabem; cai pra flex-start quando overflowar
+         (assim nada fica inacessível na esquerda durante o scroll horizontal) */
+      justify-content: safe center;
       overflow-x: auto; overflow-y: hidden;
       padding: 0;
       /* pan-y: dedo no card so passa scroll VERTICAL pra pagina (sem sambar).
